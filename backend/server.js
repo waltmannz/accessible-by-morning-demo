@@ -1,15 +1,17 @@
 import http from 'node:http';
 import path from 'node:path';
 import {randomUUID} from 'node:crypto';
-import {readFile,readdir,mkdir} from 'node:fs/promises';
+import {readFile,readdir,mkdir,writeFile} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import {runPipeline} from './pipeline.js';
 import {serveFile} from './static.js';
-import {getAgent} from './gemini.js';
+import {getAgent,GeminiManagedAgent} from './gemini.js';
+import {getApiModel} from './gemini-api.js';
 try{process.loadEnvFile();}catch{}
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const runsRoot=path.join(root,'runs');
 const runs=new Map(),controllers=new Map();
+export function hasUnresolvedManagedWork(run){return run.mode==='gemini'&&Object.values(run.remote||{}).some(remote=>['in_progress','queued','pending'].includes(remote.status));}
 function json(res,status,data){res.writeHead(status,{'content-type':'application/json','cache-control':'no-store'});res.end(JSON.stringify(data));}
 async function body(req){let buffer='';for await(const chunk of req){buffer+=chunk;if(buffer.length>16000)throw new Error('Request body too large');}return JSON.parse(buffer||'{}');}
 export async function createServer({port=Number(process.env.PORT||3000),host=process.env.HOST||'127.0.0.1'}={}) {
@@ -19,21 +21,28 @@ export async function createServer({port=Number(process.env.PORT||3000),host=pro
     try {
       const url=new URL(req.url,'http://localhost'),pathname=url.pathname;
       if(pathname==='/health')return json(res,200,{status:'ok'});
-      if(pathname==='/api/config')return json(res,200,{geminiConfigured:Boolean(process.env.GEMINI_API_KEY),defaultMode:process.env.GEMINI_API_KEY?'gemini':'local',agent:getAgent(),repository:process.env.DEMO_REPO_URL||null,humanTesting:'not-performed'});
+      if(pathname==='/api/config')return json(res,200,{geminiConfigured:Boolean(process.env.GEMINI_API_KEY),geminiApiConfigured:Boolean(process.env.GEMINI_API_KEY),apiModel:getApiModel(),defaultMode:process.env.GEMINI_API_KEY?'gemini-api':'local',agent:getAgent(),repository:process.env.DEMO_REPO_URL||null,humanTesting:'not-performed',blockedManagedRuns:[...runs.values()].filter(hasUnresolvedManagedWork).map(run=>({id:run.id,status:run.status,remote:run.remote}))});
       if(pathname==='/api/runs'&&req.method==='GET')return json(res,200,{runs:[...runs.values()].sort((a,b)=>b.startedAt.localeCompare(a.startedAt))});
       if(pathname==='/api/runs'&&req.method==='POST'){
         if(controllers.size)return json(res,409,{error:'A run is already active. Wait for it or cancel it.'});
-        const input=await body(req),mode=input.mode||(process.env.GEMINI_API_KEY?'gemini':'local');
-        if(!['gemini','local'].includes(mode))return json(res,400,{error:'Mode must be gemini or local'});
-        if(mode==='gemini'&&!process.env.GEMINI_API_KEY)return json(res,400,{error:'Set GEMINI_API_KEY in local .env to use managed agents.'});
+        const input=await body(req),mode=input.mode||(process.env.GEMINI_API_KEY?'gemini-api':'local');
+        if(!['gemini','gemini-api','local'].includes(mode))return json(res,400,{error:'Mode must be gemini, gemini-api or local'});
+        if(mode!=='local'&&!process.env.GEMINI_API_KEY)return json(res,400,{error:'Set GEMINI_API_KEY in local .env to use Gemini.'});
+        if(mode==='gemini'&&[...runs.values()].some(hasUnresolvedManagedWork))return json(res,409,{error:'An earlier hosted interaction remains active or cancellation is unconfirmed. Reconcile its remote status before starting another managed job.',blockedRunIds:[...runs.values()].filter(hasUnresolvedManagedWork).map(run=>run.id)});
         const id=`${mode}-${randomUUID().slice(0,12)}`,controller=new AbortController();controllers.set(id,controller);
         const initial={id,mode,status:'running',stage:'setup',task:'Book an appointment',startedAt:new Date().toISOString(),events:[]};runs.set(id,initial);
         runPipeline({id,mode,runDir:path.join(runsRoot,id),repoPath:path.join(root,'fixture'),task:'Book an appointment',signal:controller.signal,onEvent:state=>runs.set(id,state)}).catch(e=>{if(e.run)runs.set(id,e.run);else runs.set(id,{...initial,status:'failed',error:e.message});}).finally(()=>controllers.delete(id));
         return json(res,202,initial);
       }
-      const runMatch=pathname.match(/^\/api\/runs\/([a-zA-Z0-9-]+)(?:\/(report|cancel|events))?$/);
+      const runMatch=pathname.match(/^\/api\/runs\/([a-zA-Z0-9-]+)(?:\/(report|cancel|events|reconcile))?$/);
       if(runMatch){const [,id,action]=runMatch,run=runs.get(id);if(!run)return json(res,404,{error:'Run not found'});
         if(action==='cancel'&&req.method==='POST'){controllers.get(id)?.abort(new Error('Run cancelled by user'));return json(res,202,{id,status:controllers.has(id)?'cancelling':run.status});}
+        if(action==='reconcile'&&req.method==='POST'){
+          if(run.mode!=='gemini')return json(res,400,{error:'Only managed runs have remote status to reconcile'});
+          const client=new GeminiManagedAgent();
+          for(const remote of Object.values(run.remote||{})){if(remote.id){const actual=await client.request(`/interactions/${encodeURIComponent(remote.id)}`);remote.status=actual.status;remote.environment_id=actual.environment_id||remote.environment_id;remote.usage=actual.usage;remote.reconciledAt=new Date().toISOString();if(!['in_progress','queued','pending'].includes(actual.status))remote.cancellationStatus='terminal confirmed';}}
+          await writeFile(path.join(runsRoot,id,'run.json'),JSON.stringify(run,null,2));runs.set(id,run);return json(res,200,run);
+        }
         if(action==='report')return serveFile(res,path.join(runsRoot,id,'artifacts'),'report.md');
         if(action==='events')return json(res,200,{events:run.events,status:run.status});
         return json(res,200,run);

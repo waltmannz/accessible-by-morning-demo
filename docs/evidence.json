@@ -1,9 +1,9 @@
 {
-  "id": "local-2026-10-01T21-04-08-579Z-196664c0",
-  "mode": "local",
+  "id": "gemini-api-2026-10-01T21-26-47-571Z-47deb2fe",
+  "mode": "gemini-api",
   "baseline": {
-    "measuredAt": "2026-10-01T21:04:09.948Z",
-    "url": "http://127.0.0.1:61254",
+    "measuredAt": "2026-10-01T21:26:48.950Z",
+    "url": "http://127.0.0.1:65237",
     "lighthouseScore": 81,
     "violationCount": 4,
     "affectedNodes": 11,
@@ -256,8 +256,8 @@
     "lighthouseVersion": "13.5.0"
   },
   "verification": {
-    "measuredAt": "2026-10-01T21:04:17.636Z",
-    "url": "http://127.0.0.1:61255",
+    "measuredAt": "2026-10-01T21:27:07.918Z",
+    "url": "http://127.0.0.1:65238",
     "lighthouseScore": 100,
     "violationCount": 0,
     "affectedNodes": 0,
@@ -375,8 +375,103 @@
   },
   "review": {
     "approved": true,
-    "summary": "Fresh local browser verification; no AI reviewer or human auditor ran.",
-    "findings": []
+    "findings": [],
+    "summary": "Source review verified semantic HTML elements, explicit label associations, accessible fieldset/legend structure, button-based time slot toggle via aria-pressed, local date comparison using local calendar date parts, assertive error announcements with field focus management, polite confirmation region with programmatic focus transfer, and state reset on restarting the flow. Browser measurements independently confirmed keyboard tab flow, visible 3px focus outline, 320px reflow without horizontal scroll, and validation checks. Review is limited to static source analysis and reported automated host metrics without assistive technology audio verification.",
+    "provider": "gemini-api",
+    "model": "gemini-3.8-flash",
+    "responseId": "MtC-aoWoEcmWosUPnuORwAc",
+    "context": "Separate single-turn source review; host ran browser checks; no managed environment"
   },
+  "remote": {
+    "fixer": {
+      "role": "fixer",
+      "provider": "gemini-api",
+      "model": "gemini-3.8-flash",
+      "status": "completed",
+      "responseId": "H9C-arfQIOay1e8PtPnIgA4",
+      "usage": {
+        "promptTokenCount": 5286,
+        "candidatesTokenCount": 3907,
+        "totalTokenCount": 9193,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 5286
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "context": "independent single request; no managed environment"
+    },
+    "reviewer": {
+      "role": "reviewer",
+      "provider": "gemini-api",
+      "model": "gemini-3.8-flash",
+      "status": "completed",
+      "responseId": "MtC-aoWoEcmWosUPnuORwAc",
+      "usage": {
+        "promptTokenCount": 4415,
+        "candidatesTokenCount": 132,
+        "totalTokenCount": 4547,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 4415
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "context": "independent single request; no managed environment"
+    }
+  },
+  "sourceHashes": {
+    "index.html": "21458c06aedc401f2aa2252cf3dfd2e0f5b5f9aa156a0ded34d36315a14feda1",
+    "styles.css": "a625d7890ed318b9798e5c91736c3559db376bfb915efa02afeaaf52b3fc5143",
+    "app.js": "25cca6497aed7dca5f296fc314963dc213be80fbba19bac2761b5dc3d1e3707b"
+  },
+  "apiCalls": [
+    {
+      "role": "fixer",
+      "provider": "gemini-api",
+      "model": "gemini-3.8-flash",
+      "status": "completed",
+      "responseId": "H9C-arfQIOay1e8PtPnIgA4",
+      "usage": {
+        "promptTokenCount": 5286,
+        "candidatesTokenCount": 3907,
+        "totalTokenCount": 9193,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 5286
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "context": "independent single request; no managed environment",
+      "at": "2026-10-01T21:27:06.431Z"
+    },
+    {
+      "role": "reviewer",
+      "provider": "gemini-api",
+      "model": "gemini-3.8-flash",
+      "status": "completed",
+      "responseId": "MtC-aoWoEcmWosUPnuORwAc",
+      "usage": {
+        "promptTokenCount": 4415,
+        "candidatesTokenCount": 132,
+        "totalTokenCount": 4547,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 4415
+          }
+        ],
+        "serviceTier": "standard"
+      },
+      "context": "independent single request; no managed environment",
+      "at": "2026-10-01T21:27:15.871Z"
+    }
+  ],
   "humanTesting": "Not performed. Independent disabled audit and real screen-reader task testing remain required."
 }

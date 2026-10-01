@@ -7,11 +7,12 @@ import {auditSite} from './audit.js';
 import {startStatic} from './static.js';
 import {fixLocally} from './local-fixer.js';
 import {fixWithGemini,reviewWithGemini,FIXTURE_FILES} from './gemini.js';
+import {fixWithGeminiApi,reviewWithGeminiApi} from './gemini-api.js';
 
 const execFileAsync=promisify(execFile);
 export async function runPipeline({id,mode='local',runDir,repoPath=path.resolve('fixture'),task='Book an appointment',onEvent=()=>{},signal,resumeCandidate=false}) {
-  if(!['local','gemini'].includes(mode)) throw new Error('Unknown pipeline mode');
-  if(mode==='gemini' && !process.env.GEMINI_API_KEY) throw new Error('Configure GEMINI_API_KEY to run Gemini managed agents');
+  if(!['local','gemini','gemini-api'].includes(mode)) throw new Error('Unknown pipeline mode');
+  if(mode!=='local' && !process.env.GEMINI_API_KEY) throw new Error('Configure GEMINI_API_KEY to run Gemini');
   const beforeDir=path.join(runDir,'before'),afterDir=path.join(runDir,'after'),artifactDir=path.join(runDir,'artifacts');
   await mkdir(artifactDir,{recursive:true});
   const state={id,mode,status:'running',stage:'setup',task,startedAt:new Date().toISOString(),events:[],baseline:null,verification:null,artifacts:{report:`/api/runs/${id}/report`,patch:`/artifacts/${id}/changes.patch`,review:`/artifacts/${id}/verification/audit.json`,beforePreview:`/preview/${id}/before/`,afterPreview:`/preview/${id}/after/`,beforeLighthouse:`/artifacts/${id}/baseline/lighthouse.html`,afterLighthouse:`/artifacts/${id}/verification/lighthouse.html`,beforeScreenshot:`/artifacts/${id}/baseline/screenshot.png`,afterScreenshot:`/artifacts/${id}/verification/screenshot.png`},humanTesting:'Not performed. Independent disabled audit and real screen-reader task testing remain required.'};
@@ -37,12 +38,14 @@ export async function runPipeline({id,mode='local',runDir,repoPath=path.resolve(
     }
     await event('plan',`Baseline: ${state.baseline.violationCount} axe rule violations; keyboard task ${state.baseline.keyboard.passed?'passed':'blocked'}.`);
     let previous=resumeCandidate?state.remote?.fixer:undefined,fix,review;
-    for(let attempt=1;attempt<=3;attempt++) {
+    const maxAttempts=mode==='gemini-api'?2:mode==='gemini'&&process.env.GEMINI_EXECUTION_MODE==='stream'?1:3;
+    for(let attempt=1;attempt<=maxAttempts;attempt++) {
       signal?.throwIfAborted();
-      const onState=async remote=>{state.remote={...(state.remote||{}),[remote.role]:remote};await persist();};
+      const onState=async remote=>{state.remote={...(state.remote||{}),[remote.role]:remote};if(remote.provider==='gemini-api'&&['completed','failed'].includes(remote.status)){state.apiCalls||=[];state.apiCalls.push({...remote,at:new Date().toISOString()});}await persist();};
       if(!(resumeCandidate&&attempt===1)){
-        await event('fix',mode==='local'?'Applying the deterministic fixture repair; no hosted agent is used.':`Gemini managed fixer attempt ${attempt}: modifying mounted source in Google’s sandbox.`);
+        await event('fix',mode==='local'?'Applying the deterministic fixture repair; no hosted agent is used.':mode==='gemini-api'?`Gemini API fixer attempt ${attempt}: generating actual repaired source through a direct model call.`:`Gemini managed fixer attempt ${attempt}: modifying mounted source in Google’s sandbox.`);
         if(mode==='local') fix=await fixLocally(afterDir);
+        else if(mode==='gemini-api')fix=await fixWithGeminiApi({sourceDir:afterDir,outputDir:afterDir,audit:state.verification||state.baseline,artifactDir,onState,signal});
         else {fix=await fixWithGemini({sourceDir:afterDir,outputDir:afterDir,audit:state.verification||state.baseline,artifactDir,onState,signal,previous});previous=fix.interaction;}
         state.repair={summary:fix.summary,wcag:fix.wcag};
       }
@@ -51,12 +54,17 @@ export async function runPipeline({id,mode='local',runDir,repoPath=path.resolve(
       const measuredPass=state.verification.violationCount===0 && state.verification.keyboard.passed && state.verification.functionality.passed && state.verification.lighthouseScore===100 && state.verification.lighthouseScore>=state.baseline.lighthouseScore;
       if(mode==='gemini') {
         await event('review','A separate Gemini environment reviews only the candidate source and verification checklist.');
-        review=await reviewWithGemini({sourceDir:afterDir,audit:state.verification,artifactDir,onState,signal});state.review=review;
-      } else state.review={approved:measuredPass,summary:'Fresh local browser verification; no AI reviewer or human auditor ran.',findings:measuredPass?[]:['Automated verification failed']};
+        review=await reviewWithGemini({sourceDir:afterDir,audit:state.verification,artifactDir,onState,signal});
+        if(!review.environmentId||review.environmentId===previous?.environment_id){review.approved=false;review.findings.push('Independent reviewer must have a distinct fresh environment.');}
+        state.review=review;
+      } else if(mode==='gemini-api'){
+        await event('review','A separate Gemini API request reviews candidate source and host measurements without fixer conversation context.');
+        state.review=await reviewWithGeminiApi({sourceDir:afterDir,audit:state.verification,artifactDir,onState,signal});
+      }else state.review={approved:measuredPass,summary:'Fresh local browser verification; no AI reviewer or human auditor ran.',findings:measuredPass?[]:['Automated verification failed']};
       if(measuredPass && state.review.approved) break;
-      if(mode==='local'||attempt===3) throw new Error(`Verification gate failed: ${state.verification.violationCount} axe violations; keyboard=${state.verification.keyboard.passed}; reviewer=${state.review.approved}`);
+      if(mode==='local'||attempt===maxAttempts) throw new Error(`Verification gate failed: ${state.verification.violationCount} axe violations; keyboard=${state.verification.keyboard.passed}; reviewer=${state.review.approved}`);
       state.verification.reviewFindings=state.review.findings;
-      await event('retry','Verifier findings are returning to the fixer in its existing environment.');
+      await event('retry',mode==='gemini-api'?'Verifier findings are returning to a new Gemini API repair request with the candidate source.':'Verifier findings are returning to the fixer in its existing environment.');
     }
     await writeFile(path.join(artifactDir,'review.json'),JSON.stringify(state.review,null,2));
     state.artifacts.review=`/artifacts/${id}/review.json`;
@@ -70,7 +78,7 @@ export async function runPipeline({id,mode='local',runDir,repoPath=path.resolve(
     await writeFile(path.join(artifactDir,'changes.patch'),patch);
     state.status='completed';state.completedAt=new Date().toISOString();state.stage='complete';
     state.claim='Measured automated checks passed on this fixture. This is not a WCAG compliance certification.';
-    const report=`# Accessible by Morning: measured demo report\n\nRun: ${id}\nMode: ${mode === 'local' ? 'Deterministic local fixture repair (no Gemini calls)' : 'Gemini managed fixer and fresh managed reviewer'}\nTask: ${task}\n\n| Measurement | Before | After |\n|---|---:|---:|\n| Lighthouse accessibility | ${state.baseline.lighthouseScore ?? 'unavailable'} | ${state.verification.lighthouseScore ?? 'unavailable'} |\n| Axe rule violations | ${state.baseline.violationCount} | ${state.verification.violationCount} |\n| Affected DOM nodes | ${state.baseline.affectedNodes} | ${state.verification.affectedNodes} |\n| Keyboard booking task | ${state.baseline.keyboard.passed?'passed':'blocked'} | ${state.verification.keyboard.passed?'passed':'blocked'} |\n\n${state.repair.summary}\n\nWCAG criteria addressed: ${state.repair.wcag?.join(', ') || 'see source review'}.\n\nThe transcript is DOM semantic inspection, not NVDA/JAWS audio or human testing. The native date field receives seeded test data; date-picker keyboard gestures are not covered. ${state.humanTesting}\n\n${state.claim}\n\nEvidence: baseline/ and verification/ contain raw axe, Lighthouse, keyboard steps, screenshots, and DOM transcripts. changes.patch contains the source diff.\n`;
+    const report=`# Accessible by Morning: measured demo report\n\nRun: ${id}\nMode: ${mode === 'local' ? 'Deterministic local fixture repair (no Gemini calls)' : mode === 'gemini-api' ? 'Gemini API direct source repair and separate single-turn source review (no managed environment)' : 'Gemini managed fixer and fresh managed reviewer'}\nTask: ${task}\n\n| Measurement | Before | After |\n|---|---:|---:|\n| Lighthouse accessibility | ${state.baseline.lighthouseScore ?? 'unavailable'} | ${state.verification.lighthouseScore ?? 'unavailable'} |\n| Axe rule violations | ${state.baseline.violationCount} | ${state.verification.violationCount} |\n| Affected DOM nodes | ${state.baseline.affectedNodes} | ${state.verification.affectedNodes} |\n| Keyboard booking task | ${state.baseline.keyboard.passed?'passed':'blocked'} | ${state.verification.keyboard.passed?'passed':'blocked'} |\n\n${state.repair.summary}\n\nWCAG criteria addressed: ${state.repair.wcag?.join(', ') || 'see source review'}.\n\nThe transcript is DOM semantic inspection, not NVDA/JAWS audio or human testing. The native date field receives seeded test data; date-picker keyboard gestures are not covered. ${state.humanTesting}\n\n${state.claim}\n\nEvidence: baseline/ and verification/ contain raw axe, Lighthouse, keyboard steps, screenshots, and DOM transcripts. changes.patch contains the source diff.\n`;
     await writeFile(path.join(artifactDir,'report.md'),report);
     await writeFile(path.join(artifactDir,'pr-description.md'),report);
     await event('complete','The repaired appointment task passed the automated verification gate. Reports and source diff are ready.');

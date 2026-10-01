@@ -6,6 +6,7 @@ import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 
 test('readiness, API validation, fixture preview and persisted history survive a server restart', async () => {
   let server = await createServer({ port: 0 });
@@ -55,4 +56,25 @@ test('publication refuses failed, unmeasured or same-environment managed repairs
     { ...good, review: { approved: false } },
     { ...good, mode: 'gemini', remote: { fixer: { environment_id: 'same' }, reviewer: { environment_id: 'same' } } }
   ]) assert.throws(() => assertVerifiedRun(bad), /Refusing publication/);
+});
+
+test('persisted unresolved hosted work blocks a second paid API run before creation', async () => {
+  const id = 'gemini-test-orphan-' + randomUUID();
+  const dir = path.resolve('runs', id);
+  const originalKey = process.env.GEMINI_API_KEY;
+  let server;
+  try {
+    process.env.GEMINI_API_KEY = 'non-secret-test-key';
+    await mkdir(dir, {recursive:true});
+    await writeFile(path.join(dir, 'run.json'), JSON.stringify({id,mode:'gemini',status:'failed',startedAt:new Date().toISOString(),remote:{fixer:{id:'test-not-real',status:'in_progress',cancellationStatus:'unconfirmed'}}}));
+    server = await createServer({port:0});
+    const response = await fetch(`http://127.0.0.1:${server.address().port}/api/runs`, {method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({mode:'gemini'})});
+    assert.equal(response.status, 409);
+    const result = await response.json();
+    assert.ok(result.blockedRunIds.includes(id));
+  } finally {
+    if(server)await new Promise(resolve=>server.close(resolve));
+    if(originalKey===undefined)delete process.env.GEMINI_API_KEY;else process.env.GEMINI_API_KEY=originalKey;
+    await rm(dir,{recursive:true,force:true});
+  }
 });
