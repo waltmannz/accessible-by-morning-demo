@@ -1,0 +1,168 @@
+diff --git "a/C:\\CODE\\accessible_by_morning\\runs\\gemini-api-2026-10-01T21-26-47-571Z-47deb2fe\\before\\index.html" "b/C:\\CODE\\accessible_by_morning\\runs\\gemini-api-2026-10-01T21-26-47-571Z-47deb2fe\\after\\index.html"
+index 69fba6c..c0314bb 100644
+--- "a/C:\\CODE\\accessible_by_morning\\runs\\gemini-api-2026-10-01T21-26-47-571Z-47deb2fe\\before\\index.html"
++++ "b/C:\\CODE\\accessible_by_morning\\runs\\gemini-api-2026-10-01T21-26-47-571Z-47deb2fe\\after\\index.html"
+@@ -15,7 +15,7 @@
+   <main>
+     <section class="introduction">
+       <p class="eyebrow">YOUR NEIGHBOURHOOD CLINIC</p>
+-      <span class="page-title">A little time.<br>A healthier you.</span>
++      <h1 class="page-title">A little time.<br>A healthier you.</h1>
+       <p class="intro-copy">Book a visit with a team that listens. Choose a time, tell us a little about yourself, and we’ll take care of the rest.</p>
+       <div class="care-card"><span class="care-icon" aria-hidden="true">✚</span><div><strong>Good care, close to home.</strong><p>Monday–Friday · 8 am–6 pm<br>24 Harbour Lane, Wellington</p></div></div>
+       <p class="fixture-note">Fictional clinic for an accessibility demonstration. No appointment is sent.</p>
+@@ -24,16 +24,49 @@
+       <p class="eyebrow">LET’S FIND A TIME</p>
+       <h2 id="booking-heading">Book an appointment</h2>
+       <p class="form-intro">A quick visit. A clear next step.</p>
+-      <div id="booking-form">
+-        <div class="field"><div class="field-label">What can we help with?</div><select id="appointment-service"><option value="General consultation">General consultation · 30 min</option><option value="Health check">Health check · 45 min</option></select></div>
+-        <div class="field"><div class="field-label">Your preferred date</div><input id="appointment-date" type="date" value="2026-10-15"></div>
+-        <div class="field"><div class="field-label">Available times</div><div class="slots"><div class="slot" data-slot="09:30">9:30 am</div><div class="slot" data-slot="11:00">11:00 am</div><div class="slot" data-slot="14:30">2:30 pm</div></div></div>
+-        <div class="field-row"><div class="field"><div class="field-label">Your name</div><input id="appointment-name" placeholder="Alex Morgan" autocomplete="name"></div><div class="field"><div class="field-label">Email address</div><input id="appointment-email" type="email" placeholder="alex@example.com" autocomplete="email"></div></div>
+-        <p id="booking-error" class="booking-error" hidden></p>
+-        <div id="book-appointment" class="book-button">Book appointment <span aria-hidden="true">↗</span></div>
++      <form id="booking-form" novalidate>
++        <div class="field">
++          <label class="field-label" for="appointment-service">What can we help with?</label>
++          <select id="appointment-service">
++            <option value="General consultation">General consultation · 30 min</option>
++            <option value="Health check">Health check · 45 min</option>
++          </select>
++        </div>
++        <div class="field">
++          <label class="field-label" for="appointment-date">Your preferred date</label>
++          <input id="appointment-date" type="date" value="2026-10-15">
++        </div>
++        <fieldset class="field slot-fieldset">
++          <legend class="field-label">Available times</legend>
++          <div class="slots" role="group" aria-label="Available times">
++            <button type="button" class="slot" data-slot="09:30" aria-pressed="false">9:30 am</button>
++            <button type="button" class="slot" data-slot="11:00" aria-pressed="false">11:00 am</button>
++            <button type="button" class="slot" data-slot="14:30" aria-pressed="false">2:30 pm</button>
++          </div>
++        </fieldset>
++        <div class="field-row">
++          <div class="field">
++            <label class="field-label" for="appointment-name">Your name</label>
++            <input id="appointment-name" type="text" placeholder="Alex Morgan" autocomplete="name">
++          </div>
++          <div class="field">
++            <label class="field-label" for="appointment-email">Email address</label>
++            <input id="appointment-email" type="email" placeholder="alex@example.com" autocomplete="email">
++          </div>
++        </div>
++        <p id="booking-error" class="booking-error" role="alert" aria-live="assertive" hidden></p>
++        <button type="submit" id="book-appointment" class="book-button">
++          <span>Book appointment</span> <span aria-hidden="true">↗</span>
++        </button>
+         <p class="privacy-note">Your details stay with our care team.</p>
++      </form>
++      <div id="confirmation" class="confirmation" role="region" aria-live="polite" tabindex="-1" hidden>
++        <span class="confirmation-icon" aria-hidden="true">✓</span>
++        <h2 id="confirmation-heading">You’re booked in.</h2>
++        <p id="confirmation-details"></p>
++        <p>This is a demo booking. No appointment or email has been sent.</p>
++        <button id="book-another" class="another-button" type="button">Book another appointment</button>
+       </div>
+-      <div id="confirmation" class="confirmation" hidden><span class="confirmation-icon" aria-hidden="true">✓</span><h2>You’re booked in.</h2><p id="confirmation-details"></p><p>This is a demo booking. No appointment or email has been sent.</p><button id="book-another" class="another-button" type="button">Book another appointment</button></div>
+     </section>
+   </main>
+   <footer>Harbour Health <span>Fictional practice · Real accessibility barriers</span></footer>
+diff --git "a/C:\\CODE\\accessible_by_morning\\runs\\gemini-api-2026-10-01T21-26-47-571Z-47deb2fe\\before\\styles.css" "b/C:\\CODE\\accessible_by_morning\\runs\\gemini-api-2026-10-01T21-26-47-571Z-47deb2fe\\after\\styles.css"
+index 6687ce3..250b7dc 100644
+--- "a/C:\\CODE\\accessible_by_morning\\runs\\gemini-api-2026-10-01T21-26-47-571Z-47deb2fe\\before\\styles.css"
++++ "b/C:\\CODE\\accessible_by_morning\\runs\\gemini-api-2026-10-01T21-26-47-571Z-47deb2fe\\after\\styles.css"
+@@ -1 +1 @@
+-*{box-sizing:border-box}body{margin:0;background:#f5f3ea;color:#83877e;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6}button,input,select{font:inherit}a{color:inherit}.site-header{display:flex;align-items:center;justify-content:space-between;max-width:1180px;margin:auto;padding:32px 36px;border-bottom:1px solid #dde0d3}.brand{font-size:21px;font-weight:700;color:#263e31;text-decoration:none;display:flex;gap:12px;align-items:center}.brand-mark{font-size:35px;color:#37664b}.header-note{font-size:13px}main{max-width:1180px;margin:64px auto;display:grid;grid-template-columns:1fr 1fr;gap:90px;padding:0 36px}.introduction{padding-top:36px}.eyebrow{font-size:11px;font-weight:700;letter-spacing:.17em;color:#55705c;margin:0 0 20px}.page-title{display:block;font-family:Georgia,serif;font-size:58px;line-height:1.1;font-weight:400;color:#263e31;letter-spacing:-2px;margin:0 0 26px}.intro-copy{max-width:370px;font-size:16px;line-height:1.85}.care-card{display:flex;gap:18px;margin-top:40px;padding:24px;background:#e6eadc;border-radius:5px}.care-icon{font-size:24px;color:#37664b}.care-card strong{color:#344737;font-size:14px}.care-card p{font-size:13px;margin:6px 0 0}.fixture-note{font-size:11px;margin:30px 0;max-width:360px}.booking-card{background:#fff;padding:34px;border-radius:8px;box-shadow:0 12px 35px #2036290a}.booking-card .eyebrow{margin-bottom:8px}h2{font-family:Georgia,serif;color:#263e31;font-weight:400;font-size:29px;margin:0 0 4px}.form-intro{font-size:13px;margin:0 0 28px}.field{margin-bottom:20px;min-width:0}.field-label{color:#465248;font-weight:600;font-size:12px;display:block;margin:0 0 7px}input,select{width:100%;border:1px solid #dce1d9;border-radius:4px;padding:12px;color:#334b39;background:#fff;font-size:13px;min-height:46px}input::placeholder{color:#a1a59d}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.slot{border:1px solid #dce1d9;border-radius:4px;padding:10px 3px;text-align:center;font-size:12px;color:#607264;cursor:pointer;min-height:43px;background:#fff}.slot:hover,.slot.selected{background:#e8efe5;border-color:#709674;color:#2d5038}.book-button{display:flex;justify-content:space-between;align-items:center;background:#315d43;color:#fff;border:0;border-radius:4px;width:100%;padding:14px 18px;font-size:13px;font-weight:700;cursor:pointer}.book-button:hover{background:#244832}.privacy-note{text-align:center;font-size:11px;margin:12px 0 0}.booking-error{color:#a42c2c;font-size:13px}.confirmation{padding:32px 0}.confirmation-icon{background:#e6efdf;color:#315d43;width:50px;height:50px;display:grid;place-items:center;border-radius:50%;font-size:25px;margin-bottom:22px}.confirmation p{font-size:14px}.another-button{background:#315d43;color:#fff;padding:12px 20px;border:0;border-radius:4px;cursor:pointer}footer{max-width:1180px;margin:auto;padding:24px 36px;border-top:1px solid #dde0d3;font-size:11px;display:flex;justify-content:space-between}:focus{outline:none}[hidden]{display:none!important}@media(max-width:800px){main{grid-template-columns:1fr;gap:30px;margin:24px auto;padding:0 22px}.introduction{padding-top:10px}.page-title{font-size:45px}.care-card{margin-top:22px}.site-header{padding:24px 22px}.header-note{display:none}.booking-card{padding:25px}footer{padding:20px 22px;gap:15px;flex-wrap:wrap}}@media(max-width:400px){.field-row{grid-template-columns:1fr;gap:0}.slots{gap:5px}.slot{font-size:11px}.brand{font-size:19px}}
++*{box-sizing:border-box}body{margin:0;background:#f5f3ea;color:#464a43;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6}button,input,select{font:inherit}a{color:inherit}.site-header{display:flex;align-items:center;justify-content:space-between;max-width:1180px;margin:auto;padding:32px 36px;border-bottom:1px solid #c9cdbe}.brand{font-size:21px;font-weight:700;color:#203529;text-decoration:none;display:flex;gap:12px;align-items:center}.brand-mark{font-size:35px;color:#28523b}.header-note{font-size:13px;color:#464a43}main{max-width:1180px;margin:64px auto;display:grid;grid-template-columns:1fr 1fr;gap:90px;padding:0 36px}.introduction{padding-top:36px}.eyebrow{font-size:11px;font-weight:700;letter-spacing:.17em;color:#385240;margin:0 0 20px}.page-title{display:block;font-family:Georgia,serif;font-size:58px;line-height:1.1;font-weight:400;color:#203529;letter-spacing:-2px;margin:0 0 26px}.intro-copy{max-width:370px;font-size:16px;line-height:1.85;color:#464a43}.care-card{display:flex;gap:18px;margin-top:40px;padding:24px;background:#e2e8d7;border-radius:5px}.care-icon{font-size:24px;color:#28523b}.care-card strong{color:#203529;font-size:14px}.care-card p{font-size:13px;margin:6px 0 0;color:#3f483c}.fixture-note{font-size:12px;margin:30px 0;max-width:360px;color:#4b5448}.booking-card{background:#fff;padding:34px;border-radius:8px;box-shadow:0 12px 35px #2036290a}.booking-card .eyebrow{margin-bottom:8px}h2{font-family:Georgia,serif;color:#203529;font-weight:400;font-size:29px;margin:0 0 4px}.form-intro{font-size:13px;margin:0 0 28px;color:#464a43}.field{margin-bottom:20px;min-width:0}.slot-fieldset{border:none;padding:0;margin:0 0 20px}.slot-fieldset legend{padding:0}.field-label{color:#2a3a2d;font-weight:600;font-size:12px;display:block;margin:0 0 7px}input,select{width:100%;border:1px solid #9aa598;border-radius:4px;padding:12px;color:#203529;background:#fff;font-size:13px;min-height:46px}input::placeholder{color:#6b7367}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.slot{border:1px solid #7c8e7e;border-radius:4px;padding:10px 3px;text-align:center;font-size:12px;color:#233a27;cursor:pointer;min-height:43px;background:#fff;font-weight:600;font-family:inherit}.slot:hover,.slot.selected,.slot[aria-pressed="true"]{background:#e3ede0;border-color:#2a5735;color:#183620;outline:none}.book-button{display:flex;justify-content:space-between;align-items:center;background:#245437;color:#fff;border:0;border-radius:4px;width:100%;padding:14px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}.book-button:hover{background:#1a412a}.privacy-note{text-align:center;font-size:12px;margin:12px 0 0;color:#464a43}.booking-error{color:#901c1c;font-size:13px;font-weight:600;margin:0 0 16px;background:#fdecec;padding:10px 12px;border-radius:4px;border:1px solid #f3bcbc}.confirmation{padding:32px 0}.confirmation:focus{outline:none}.confirmation-icon{background:#e2eed9;color:#245437;width:50px;height:50px;display:grid;place-items:center;border-radius:50%;font-size:25px;margin-bottom:22px}.confirmation p{font-size:14px;color:#353e33}.another-button{background:#245437;color:#fff;padding:12px 20px;border:0;border-radius:4px;cursor:pointer;font-weight:600;font-family:inherit}.another-button:hover{background:#1a412a}footer{max-width:1180px;margin:auto;padding:24px 36px;border-top:1px solid #c9cdbe;font-size:12px;color:#464a43;display:flex;justify-content:space-between}:focus-visible{outline:3px solid #205e3b;outline-offset:2px}[hidden]{display:none!important}@media(max-width:800px){main{grid-template-columns:1fr;gap:30px;margin:24px auto;padding:0 22px}.introduction{padding-top:10px}.page-title{font-size:45px}.care-card{margin-top:22px}.site-header{padding:24px 22px}.header-note{display:none}.booking-card{padding:25px}footer{padding:20px 22px;gap:15px;flex-wrap:wrap}}@media(max-width:400px){.field-row{grid-template-columns:1fr;gap:0}.slots{gap:5px}.slot{font-size:11px}.brand{font-size:19px}}
+diff --git "a/C:\\CODE\\accessible_by_morning\\runs\\gemini-api-2026-10-01T21-26-47-571Z-47deb2fe\\before\\app.js" "b/C:\\CODE\\accessible_by_morning\\runs\\gemini-api-2026-10-01T21-26-47-571Z-47deb2fe\\after\\app.js"
+index b7758f1..e84f694 100644
+--- "a/C:\\CODE\\accessible_by_morning\\runs\\gemini-api-2026-10-01T21-26-47-571Z-47deb2fe\\before\\app.js"
++++ "b/C:\\CODE\\accessible_by_morning\\runs\\gemini-api-2026-10-01T21-26-47-571Z-47deb2fe\\after\\app.js"
+@@ -2,33 +2,77 @@ let selectedTime = '';
+ const bookingForm = document.getElementById('booking-form');
+ const confirmation = document.getElementById('confirmation');
+ const error = document.getElementById('booking-error');
+-document.querySelectorAll('[data-slot]').forEach(slot => {
++const dateInput = document.getElementById('appointment-date');
++const nameInput = document.getElementById('appointment-name');
++const emailInput = document.getElementById('appointment-email');
++const serviceInput = document.getElementById('appointment-service');
++const slotButtons = document.querySelectorAll('[data-slot]');
++
++function getLocalDateString() {
++  const now = new Date();
++  const year = now.getFullYear();
++  const month = String(now.getMonth() + 1).padStart(2, '0');
++  const day = String(now.getDate()).padStart(2, '0');
++  return `${year}-${month}-${day}`;
++}
++
++slotButtons.forEach(slot => {
+   slot.addEventListener('click', () => {
+     selectedTime = slot.dataset.slot;
+-    document.querySelectorAll('[data-slot]').forEach(item => item.classList.toggle('selected', item === slot));
++    slotButtons.forEach(item => {
++      const isSelected = item === slot;
++      item.classList.toggle('selected', isSelected);
++      item.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
++    });
+   });
+ });
+-document.getElementById('book-appointment').addEventListener('click', event => {
++
++bookingForm.addEventListener('submit', event => {
+   event.preventDefault();
+-  const name = document.getElementById('appointment-name').value.trim();
+-  const email = document.getElementById('appointment-email').value.trim();
+-  const date = document.getElementById('appointment-date').value;
++  const name = nameInput.value.trim();
++  const email = emailInput.value.trim();
++  const date = dateInput.value;
++  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
++  const localToday = getLocalDateString();
++
+   if (!name || !email || !date || !selectedTime) {
+     error.textContent = 'Please enter your name, email, date, and choose an available time.';
+     error.hidden = false;
++    error.focus?.();
+     return;
+   }
+-  if (!document.getElementById('appointment-email').validity.valid) {
++  if (!emailPattern.test(email)) {
+     error.textContent = 'Enter an email address like alex@example.com.';
+     error.hidden = false;
++    emailInput.focus();
+     return;
+   }
++  if (date <= localToday) {
++    error.textContent = 'Please select a future appointment date.';
++    error.hidden = false;
++    dateInput.focus();
++    return;
++  }
++
+   error.hidden = true;
+-  document.getElementById('confirmation-details').textContent = `${name}, your ${document.getElementById('appointment-service').value.toLowerCase()} is reserved for ${date} at ${selectedTime}.`;
++  error.textContent = '';
++  document.getElementById('confirmation-details').textContent = `${name}, your ${serviceInput.value.toLowerCase()} is reserved for ${date} at ${selectedTime}.`;
+   bookingForm.hidden = true;
+   confirmation.hidden = false;
++  confirmation.focus();
+ });
++
+ document.getElementById('book-another').addEventListener('click', () => {
+   confirmation.hidden = true;
+   bookingForm.hidden = false;
++  nameInput.value = '';
++  emailInput.value = '';
++  selectedTime = '';
++  slotButtons.forEach(item => {
++    item.classList.remove('selected');
++    item.setAttribute('aria-pressed', 'false');
++  });
++  error.hidden = true;
++  error.textContent = '';
++  serviceInput.focus();
+ });

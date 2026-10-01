@@ -35,7 +35,7 @@ await page.waitForFunction(()=>document.getElementById('remote-status-panel').hi
 check('Confirmed terminal cloud status releases managed block',await page.locator('#start-run').isEnabled());
 check('Only reconciliation requests occurred; no new agent run',reconciliations===2&&starts===0);
 await page.evaluate(()=>renderRun({id:'ui-api-restored',mode:'gemini-api',status:'completed',stage:'complete',events:[]}));
-check('Restored direct API run selects its own engine',await page.locator('input[name="mode"][value="gemini-api"]').isChecked());
+check('Inspecting an API result preserves the chosen engine for a new run',await page.locator('input[name="mode"][value="gemini"]').isChecked());
 check('Direct API results never claim hosted Managed Agent',(await page.locator('#run-engine').textContent())==='GEMINI API · SOURCE REPAIR + REVIEW');
 const running={id:'ui-running',mode:'gemini',status:'running',stage:'fix',events:[],remote:{fixer:{id:'mock-running-id',status:'in_progress'}}};
 await page.route('**/api/runs/ui-running/cancel',route=>respond(route,{id:running.id,status:'cancelling'},202));

@@ -1,0 +1,17 @@
+DOM semantic inspection, not NVDA/JAWS or human testing.
+h1: A little time.A healthier you.
+h2: Book an appointment
+label: What can we help with?
+select: What can we help with?
+label: Your preferred date
+input: Your preferred date
+button: 9:30 am
+button: 11:00 am
+button: 2:30 pm
+label: Your name
+input: Your name
+label: Email address
+input: Email address
+button: Book appointment ↗
+h2: You’re booked in.
+button: Book another appointment

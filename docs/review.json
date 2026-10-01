@@ -1,0 +1,9 @@
+{
+  "approved": true,
+  "findings": [],
+  "summary": "Source review verified semantic HTML elements, explicit label associations, accessible fieldset/legend structure, button-based time slot toggle via aria-pressed, local date comparison using local calendar date parts, assertive error announcements with field focus management, polite confirmation region with programmatic focus transfer, and state reset on restarting the flow. Browser measurements independently confirmed keyboard tab flow, visible 3px focus outline, 320px reflow without horizontal scroll, and validation checks. Review is limited to static source analysis and reported automated host metrics without assistive technology audio verification.",
+  "provider": "gemini-api",
+  "model": "gemini-3.8-flash",
+  "responseId": "MtC-aoWoEcmWosUPnuORwAc",
+  "context": "Separate single-turn source review; host ran browser checks; no managed environment"
+}

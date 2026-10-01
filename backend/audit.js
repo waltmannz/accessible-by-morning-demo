@@ -4,6 +4,20 @@ import lighthouse from 'lighthouse';
 import { launch } from 'chrome-launcher';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+export const REQUIRED_AUDIT_STATES=['initial','validation-error','keyboard-focus','confirmation','reflow'];
+const STATE_LABELS={'initial':'Initial booking page','validation-error':'Visible validation error','keyboard-focus':'Keyboard focus before booking','confirmation':'Booking confirmation','reflow':'320 CSS pixel booking page'};
+export function aggregateStateViolations(states){
+  const rules=new Map();
+  for(const state of states.filter(s=>s.status==='measured'))for(const violation of state.violations){
+    const merged=rules.get(violation.id)||{...violation,nodes:[],stateIds:[]};
+    if(!merged.stateIds.includes(state.id))merged.stateIds.push(state.id);
+    for(const node of violation.nodes){const key=JSON.stringify(node.target);const existing=merged.nodes.find(n=>JSON.stringify(n.target)===key);if(existing){if(!existing.stateIds.includes(state.id))existing.stateIds.push(state.id);}else merged.nodes.push({...node,stateIds:[state.id]});}
+    rules.set(violation.id,merged);
+  }
+  const violations=[...rules.values()];return {violations,violationCount:violations.length,affectedNodes:violations.reduce((sum,v)=>sum+v.nodes.length,0)};
+}
+const simplifyViolation=v=>({id:v.id,impact:v.impact,description:v.description,help:v.help,helpUrl:v.helpUrl,tags:v.tags,nodes:v.nodes.map(n=>({html:n.html,target:n.target,failureSummary:n.failureSummary}))});
+async function semanticTranscript(page){return page.evaluate(()=>Array.from(document.querySelectorAll('h1,h2,h3,nav a,label,input,select,button,[role="button"],[data-slot],#book-appointment,#booking-error,#confirmation')).filter(el=>el.getClientRects().length>0).map(el=>{const label=el.getAttribute('aria-label')||(el.labels?.length?Array.from(el.labels).map(l=>l.textContent.trim()).join(' '):'')||(['INPUT','SELECT'].includes(el.tagName)?'unlabelled':el.textContent.trim());return `${el.getAttribute('role')||el.tagName.toLowerCase()}: ${label}`;}));}
 
 async function tabTo(page,selector,max=35) {
   for(let i=0;i<max;i++) {
@@ -12,7 +26,7 @@ async function tabTo(page,selector,max=35) {
   }
   return false;
 }
-export async function keyboardBooking(page) {
+export async function keyboardBooking(page,{captureState=async()=>{},signal}={}) {
   const steps=[]; const check=(name,passed,detail)=>steps.push({name,passed,detail});
   await page.goto(page.url());
   const tomorrow=await page.evaluate(()=>{const d=new Date();d.setDate(d.getDate()+1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;});
@@ -34,19 +48,23 @@ export async function keyboardBooking(page) {
   if(!submit) return {passed:false,steps,confirmation:false};
   const focus=await page.locator('#book-appointment').evaluate(el=>{const s=getComputedStyle(el);return {outline:s.outlineStyle,width:s.outlineWidth};});
   check('Visible keyboard focus',focus.outline!=='none' && focus.width!=='0px',JSON.stringify(focus));
+  signal?.throwIfAborted();await captureState('keyboard-focus');
   await page.keyboard.press('Enter');
   await page.waitForTimeout(150);
   const confirmation=await page.locator('#confirmation').isVisible();
   check('Booking confirmation appears after Enter',confirmation);
+  if(confirmation)await captureState('confirmation');
   const announced=await page.locator('#confirmation').evaluate(el=>['status','alert'].includes(el.getAttribute('role')) || ['polite','assertive'].includes(el.getAttribute('aria-live')));
   check('Confirmation has announcement semantics',announced);
   return {passed:steps.every(s=>s.passed),steps,confirmation};
 }
-export async function functionalChecks(page) {
+export async function functionalChecks(page,{captureState=async()=>{},signal}={}) {
   const checks=[];
   const check=(name,passed,detail)=>checks.push({name,passed,detail});
   const validDate=await page.evaluate(()=>{const d=new Date();d.setDate(d.getDate()+2);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;});
+  const today=await page.evaluate(()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;});
   const seed=async({date=validDate,email='alex@example.com',name='Alex Taylor',slot=true}={})=>{
+    signal?.throwIfAborted();
     await page.goto(page.url());
     await page.locator('#appointment-name').fill(name);
     await page.locator('#appointment-email').fill(email);
@@ -56,8 +74,12 @@ export async function functionalChecks(page) {
   };
   await seed({date:'2000-01-01'});
   check('Past appointment date is rejected',!(await page.locator('#confirmation').isVisible()) && await page.locator('#booking-error').isVisible());
+  if(await page.locator('#booking-error').isVisible())await captureState('validation-error');
+  await seed({date:today});
+  check('Today is rejected using browser local calendar',!(await page.locator('#confirmation').isVisible())&&await page.locator('#booking-error').isVisible());
   await seed({email:'not-an-email'});
   check('Invalid email is rejected',!(await page.locator('#confirmation').isVisible()) && await page.locator('#booking-error').isVisible());
+  if(await page.locator('#booking-error').isVisible())await captureState('validation-error');
   await seed({name:''});
   check('Missing name is rejected',!(await page.locator('#confirmation').isVisible()) && await page.locator('#booking-error').isVisible());
   await seed({slot:false});
@@ -68,6 +90,7 @@ export async function functionalChecks(page) {
   await seed({date});
   const details=await page.locator('#confirmation-details').textContent();
   check('Confirmation preserves booking details',await page.locator('#confirmation').isVisible() && details.includes('Alex Taylor') && details.includes(date) && details.includes('09:30'));
+  if(await page.locator('#confirmation').isVisible())await captureState('confirmation');
   if(await page.locator('#confirmation').isVisible()) {
     await page.locator('#book-another').click();
     check('Book another restores the form',await page.locator('#booking-form').isVisible() && !(await page.locator('#confirmation').isVisible()));
@@ -75,41 +98,58 @@ export async function functionalChecks(page) {
   await page.setViewportSize({width:320,height:900});
   await page.goto(page.url());
   check('320 CSS pixel reflow has no horizontal overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1),'Viewport proxy for 400% zoom at 1280px, not a magnifier user test.');
+  await captureState('reflow');
   return {passed:checks.every(c=>c.passed),checks};
 }
 export async function auditSite({url,outputDir,signal}) {
   await mkdir(outputDir,{recursive:true}); signal?.throwIfAborted();
   // Every invocation starts a new browser: verification never reuses fixer state.
   const browser=await chromium.launch({headless:true}); let result;
+  const abortBrowser=()=>{void browser.close().catch(()=>{});};signal?.addEventListener('abort',abortBrowser,{once:true});
   try {
+    signal?.throwIfAborted();
     const page=await browser.newPage({viewport:{width:1440,height:1080}});
+    page.setDefaultTimeout(5000);page.setDefaultNavigationTimeout(15000);
     await page.goto(url,{waitUntil:'networkidle'});
     await page.screenshot({path:path.join(outputDir,'screenshot.png'),fullPage:true});
-    await page.addScriptTag({content:axe.source});
-    const raw=await page.evaluate(async()=>window.axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa','best-practice']}}));
+    const states=[];let initialRaw;
+    const captureState=async id=>{
+      signal?.throwIfAborted();if(states.some(s=>s.id===id))return;
+      const dir=path.join(outputDir,'states',id);await mkdir(dir,{recursive:true});
+      if(!await page.evaluate(()=>Boolean(window.axe)))await page.addScriptTag({content:axe.source});
+      const raw=await page.evaluate(async()=>window.axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa','best-practice']}}));
+      if(id==='initial')initialRaw=raw;
+      await writeFile(path.join(dir,'axe.json'),JSON.stringify(raw,null,2));
+      await page.screenshot({path:path.join(dir,'screenshot.png'),fullPage:true});
+      const transcript=await semanticTranscript(page);await writeFile(path.join(dir,'semantic-transcript.txt'),'DOM semantic inspection, not NVDA/JAWS or human testing.\n'+transcript.join('\n'));
+      const violations=raw.violations.map(simplifyViolation);
+      states.push({id,label:STATE_LABELS[id],status:'measured',measuredAt:new Date().toISOString(),violationCount:violations.length,affectedNodes:violations.reduce((n,v)=>n+v.nodes.length,0),violations,artifacts:{axe:`states/${id}/axe.json`,screenshot:`states/${id}/screenshot.png`,transcript:`states/${id}/semantic-transcript.txt`}});
+    };
+    await captureState('initial');const raw=initialRaw;
     await writeFile(path.join(outputDir,'axe.json'),JSON.stringify(raw,null,2));
-    const transcript=await page.evaluate(()=>Array.from(document.querySelectorAll('h1,h2,h3,nav a,label,input,select,button,[role="button"],[data-slot],#book-appointment')).map(el=>{
-      const label=el.getAttribute('aria-label') || (el.labels?.length?Array.from(el.labels).map(l=>l.textContent.trim()).join(' '):'') || (['INPUT','SELECT'].includes(el.tagName)?'unlabelled':el.textContent.trim());
-      return `${el.getAttribute('role')||el.tagName.toLowerCase()}: ${label}`;
-    }));
+    const transcript=await semanticTranscript(page);
     await writeFile(path.join(outputDir,'semantic-transcript.txt'),'DOM semantic inspection, not NVDA/JAWS or human testing.\n'+transcript.join('\n'));
-    const keyboard=await keyboardBooking(page);
+    const keyboard=await keyboardBooking(page,{captureState,signal});
     await writeFile(path.join(outputDir,'keyboard.json'),JSON.stringify(keyboard,null,2));
-    const functionality=await functionalChecks(page);
+    const functionality=await functionalChecks(page,{captureState,signal});
     await writeFile(path.join(outputDir,'functionality.json'),JSON.stringify(functionality,null,2));
-    const violations=raw.violations.map(v=>({id:v.id,impact:v.impact,description:v.description,help:v.help,helpUrl:v.helpUrl,tags:v.tags,nodes:v.nodes.map(n=>({html:n.html,target:n.target,failureSummary:n.failureSummary}))}));
-    result={measuredAt:new Date().toISOString(),url,lighthouseScore:null,violationCount:violations.length,affectedNodes:violations.reduce((sum,v)=>sum+v.nodes.length,0),violations,keyboard,functionality,transcript,transcriptType:'DOM semantics; not a real screen reader',humanAudit:{status:'not-performed'},axeVersion:raw.testEngine.version};
-  } finally { await browser.close(); }
+    for(const id of REQUIRED_AUDIT_STATES)if(!states.some(s=>s.id===id))states.push({id,label:STATE_LABELS[id],status:'skipped',reason:'The task could not reach this state; inspect keyboard and functional check failures.'});
+    const aggregate=aggregateStateViolations(states);
+    result={schemaVersion:2,measuredAt:new Date().toISOString(),url,lighthouseScore:null,...aggregate,initialViolationCount:raw.violations.length,initialAffectedNodes:raw.violations.reduce((sum,v)=>sum+v.nodes.length,0),states,requiredStateIds:REQUIRED_AUDIT_STATES,stateCoveragePassed:REQUIRED_AUDIT_STATES.every(id=>states.some(s=>s.id===id&&s.status==='measured')),keyboard,functionality,transcript,transcriptType:'DOM semantics; not a real screen reader',humanAudit:{status:'not-performed'},axeVersion:raw.testEngine.version};
+  } catch(error) {signal?.throwIfAborted();throw error;} finally {signal?.removeEventListener('abort',abortBrowser); await browser.close(); }
   signal?.throwIfAborted();
   let chrome;
+  const abortChrome=()=>{if(chrome)void chrome.kill().catch(()=>{});};signal?.addEventListener('abort',abortChrome,{once:true});
   try {
     chrome=await launch({chromePath:chromium.executablePath(),chromeFlags:['--headless=new','--no-sandbox','--disable-dev-shm-usage'],logLevel:'silent'});
+    signal?.throwIfAborted();
     const report=await lighthouse(url,{port:chrome.port,onlyCategories:['accessibility'],logLevel:'error',output:['json','html'],formFactor:'desktop',screenEmulation:{mobile:false,width:1440,height:1080,deviceScaleFactor:1,disabled:false}});
     result.lighthouseScore=Math.round(report.lhr.categories.accessibility.score*100);
     result.lighthouseVersion=report.lhr.lighthouseVersion;
     await writeFile(path.join(outputDir,'lighthouse.json'),report.report[0]);
     await writeFile(path.join(outputDir,'lighthouse.html'),report.report[1]);
-  } catch(error) { result.lighthouseError=error.message; } finally { if(chrome) await chrome.kill(); }
+  } catch(error) { result.lighthouseError=error.message; } finally {signal?.removeEventListener('abort',abortChrome); if(chrome) await chrome.kill(); }
+  signal?.throwIfAborted();
   await writeFile(path.join(outputDir,'audit.json'),JSON.stringify(result,null,2));
   return result;
 }

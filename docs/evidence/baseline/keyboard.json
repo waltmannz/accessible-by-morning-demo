@@ -1,0 +1,31 @@
+{
+  "passed": false,
+  "steps": [
+    {
+      "name": "Reach appointment-service by Tab",
+      "passed": true
+    },
+    {
+      "name": "Reach appointment-date by Tab",
+      "passed": true
+    },
+    {
+      "name": "Date test data supplied",
+      "passed": true,
+      "detail": "Native date value seeded; date-picker keystrokes are not covered."
+    },
+    {
+      "name": "Reach appointment-name by Tab",
+      "passed": true
+    },
+    {
+      "name": "Reach appointment-email by Tab",
+      "passed": true
+    },
+    {
+      "name": "Reach 09:30 appointment slot by Tab",
+      "passed": false
+    }
+  ],
+  "confirmation": false
+}

@@ -1,0 +1,4 @@
+# Published evidence hashes bind the exact committed and served bytes.
+docs/** -text
+# Preserve generated Lighthouse HTML verbatim, including its template whitespace.
+docs/evidence/**/lighthouse.html -whitespace

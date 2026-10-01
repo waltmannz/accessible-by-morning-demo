@@ -1,0 +1,10 @@
+DOM semantic inspection, not NVDA/JAWS or human testing.
+h1: A little time.A healthier you.
+h2: Book an appointment
+region: ✓
+        You’re booked in.
+        Alex Taylor, your health check is reserved for 2026-10-03 at 09:30.
+        This is a demo booking. No appointment or email has been sent.
+        Book another appointment
+h2: You’re booked in.
+button: Book another appointment

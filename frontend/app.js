@@ -9,6 +9,10 @@ let geminiApiModel = '';
 let previewResizeObserver;
 let blockedManagedRuns = [];
 let cancellationRequestedFor = null;
+let knownRuns = [];
+let historySignature = '';
+let selectionEpoch = 0;
+let newEngineChanged = false;
 const terminalStatuses = ['completed', 'complete', 'succeeded', 'failed', 'error', 'interrupted', 'cancelled'];
 const isTerminal = run => terminalStatuses.includes(run?.status);
 const remoteUnresolved = run => run?.mode === 'gemini' && Object.values(run.remote || {}).some(remote => ['in_progress', 'queued', 'pending'].includes(remote.status));
@@ -23,7 +27,7 @@ function updateMode() {
   $('mode-note').textContent = mode === 'gemini' ? (geminiConfig?.available === false ? geminiConfig.reason || 'Managed mode needs Google API credentials. Configure the server to enable a real cloud run.' : 'A real Google cloud agent repairs mounted fixture files, then a fresh agent reviews them. Requires a Gemini API key; a run can take several minutes.') : mode === 'gemini-api' ? (geminiApiConfigured === false ? 'Gemini API mode needs GEMINI_API_KEY in the server environment.' : `Direct Gemini model calls repair and independently review the code. A fresh local browser verifies the result.${geminiApiModel ? ` Model: ${geminiApiModel}.` : ''}`) : 'Local mode applies known repairs to a copy of the code. All audit results are measured from the browser.';
   updateStartAvailability();
 }
-document.querySelectorAll('input[name="mode"]').forEach(input => input.addEventListener('change', updateMode));
+document.querySelectorAll('input[name="mode"]').forEach(input => input.addEventListener('change', () => { newEngineChanged = true; updateMode(); }));
 $('preview').addEventListener('load', () => {
   previewResizeObserver?.disconnect();
   try {
@@ -45,18 +49,63 @@ async function refreshConfig(initial = false) {
     geminiApiConfigured = config.geminiApiConfigured ?? config.geminiConfigured;
     geminiApiModel = config.apiModel || '';
     blockedManagedRuns = config.blockedManagedRuns || [];
-    if (initial && !activeRun && ['local', 'gemini', 'gemini-api'].includes(config.defaultMode)) document.querySelector(`input[name="mode"][value="${config.defaultMode}"]`).checked = true;
+    if (initial && !newEngineChanged && ['local', 'gemini', 'gemini-api'].includes(config.defaultMode)) document.querySelector(`input[name="mode"][value="${config.defaultMode}"]`).checked = true;
     if (config.repository) { try { const repository = new URL(config.repository); if (['http:', 'https:'].includes(repository.protocol)) { $('repo').value = repository.pathname.replace(/^\//, '').replace(/\.git$/, ''); $('repo-link').href = repository.href; } } catch {} }
     renderRemoteStatus(); updateMode();
   } catch {}
 }
 refreshConfig(true);
 function updateStartAvailability() {
-  const active = activeRun && !isTerminal(activeRun);
+  const active = (activeRun && !isTerminal(activeRun)) || knownRuns.some(run => !isTerminal(run));
   const blocked = selectedMode() === 'gemini' && blockedManagedRuns.length > 0;
   $('start-run').disabled = Boolean(active || blocked);
-  $('start-run').firstElementChild.textContent = active ? 'Repair run in progress' : blocked ? 'Resolve hosted status first' : activeRun ? 'Start another repair run' : 'Start repair run';
+  $('start-run').firstElementChild.textContent = active ? 'A repair run is in progress' : blocked ? 'Resolve hosted status first' : activeRun ? 'Start a new repair run' : 'Start repair run';
 }
+function historyDate(run) { const date = new Date(run.completedAt || run.verification?.measuredAt || run.startedAt); return Number.isFinite(date.getTime()) ? new Intl.DateTimeFormat('en-NZ', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'Pacific/Auckland'}).format(date) : 'Date unavailable'; }
+function isVerified(run) { return run.status === 'completed' && run.review?.approved === true && run.verification?.violationCount === 0 && run.verification?.keyboard?.passed === true; }
+function refreshHistoryOptions() {
+  const signature = JSON.stringify(knownRuns.map(run => [run.id,run.mode,run.status]));
+  if (signature !== historySignature) {
+    historySignature = signature;
+    $('run-history').replaceChildren();
+    if (!knownRuns.length) { const option = document.createElement('option'); option.value=''; option.textContent='No recorded runs yet'; $('run-history').append(option); }
+    knownRuns.forEach(run => { const option = document.createElement('option'); option.value=run.id; option.textContent=`${run.replay ? 'Recorded ' : ''}${run.mode === 'gemini-api' ? 'Gemini API' : run.mode === 'gemini' ? 'Managed Agent' : 'Local'} · ${isVerified(run) ? 'Verified' : run.status} · ${historyDate(run)} · ${run.id.slice(-8)}`; $('run-history').append(option); });
+  }
+  if (activeRun && knownRuns.some(run => run.id === activeRun.id)) $('run-history').value = activeRun.id;
+}
+function rememberRun(run) { const index=knownRuns.findIndex(item=>item.id===run.id); if(index<0) knownRuns.unshift(run); else knownRuns[index]=run; refreshHistoryOptions(); }
+async function selectRecordedRun(id, {persist = true} = {}) {
+  const epoch=++selectionEpoch; clearTimeout(pollTimer);
+  $('history-note').textContent='Loading the recorded evidence…';
+  try {
+    const response=await fetch(`/api/runs/${encodeURIComponent(id)}`);
+    if(!response.ok) throw new Error('This recorded run is unavailable. Refresh the run list to choose another.');
+    const run=await response.json(); if(epoch!==selectionEpoch)return;
+    renderRun(run); setPreview(isVerified(run)?'after':'before');
+    if(persist)try{localStorage.setItem('accessible-by-morning-run',run.id);}catch{}
+    if(!isTerminal(run))pollRun(run.id);
+  }catch(error){if(epoch===selectionEpoch)$('history-note').textContent=error.message;}
+}
+async function loadHistory(initial=false) {
+  $('refresh-history').disabled=true;
+  try {
+    const response=await fetch('/api/runs'); if(!response.ok)throw new Error('Recorded runs are unavailable. You can still configure a new run.');
+    const data=await response.json(); knownRuns=data.runs||[]; refreshHistoryOptions();
+    if(initial){
+      let requested=new URLSearchParams(location.search).get('run');
+      if(!requested)try{requested=localStorage.getItem('accessible-by-morning-run');}catch{}
+      const saved=knownRuns.find(run=>run.id===requested);
+      const preferred=saved||knownRuns.find(run=>isVerified(run)&&['gemini','gemini-api'].includes(run.mode))||knownRuns.find(isVerified)||knownRuns[0];
+      if(preferred)await selectRecordedRun(preferred.id,{persist:false});
+      else $('history-note').textContent='No results recorded yet. Viewing this page does not start an agent.';
+    }else if(activeRun){const latest=knownRuns.find(run=>run.id===activeRun.id);if(latest)renderRun(latest);}
+    updateStartAvailability();
+  }catch(error){$('history-note').textContent=error.message;}
+  finally{$('refresh-history').disabled=false;}
+}
+$('run-history').addEventListener('change',()=>{if($('run-history').value)selectRecordedRun($('run-history').value);});
+$('refresh-history').addEventListener('click',()=>{loadHistory();refreshConfig();});
+loadHistory(true);
 function renderRemoteStatus() {
   $('remote-status-panel').hidden = !blockedManagedRuns.length;
   $('remote-run-list').replaceChildren();
@@ -73,7 +122,7 @@ function renderRemoteStatus() {
     const view = document.createElement('button'); view.type = 'button'; view.className = 'secondary-button'; view.textContent = 'View run';
     view.addEventListener('click', async () => { view.disabled = true; try { const response = await fetch(`/api/runs/${encodeURIComponent(run.id)}`); const state = await response.json(); if (!response.ok) throw new Error(state.error || 'Could not load this run.'); renderRun(state); setPreview('before'); try { localStorage.setItem('accessible-by-morning-run', state.id); } catch {} if (!isTerminal(state)) { clearTimeout(pollTimer); pollRun(state.id); } $('run-status').scrollIntoView({block: 'center', behavior: 'smooth'}); } catch (error) { $('run-error').hidden = false; $('run-error').textContent = error.message; } finally { view.disabled = false; } });
     const reconcile = document.createElement('button'); reconcile.type = 'button'; reconcile.className = 'secondary-button'; reconcile.textContent = 'Check cloud status';
-    reconcile.addEventListener('click', async () => { reconcile.disabled = true; reconcile.textContent = 'Checking…'; try { const response = await fetch(`/api/runs/${encodeURIComponent(run.id)}/reconcile`, {method: 'POST'}); const state = await response.json(); if (!response.ok) throw new Error(state.error || 'Could not check cloud status.'); if (activeRun?.id === run.id) renderRun(state); await refreshConfig(); $('run-action-note').hidden = false; $('run-action-note').textContent = remoteUnresolved(state) ? 'Cloud work is still active. Cancellation has not been confirmed.' : 'Cloud status reached a terminal state. This status check did not create a new agent run.'; } catch (error) { $('run-error').hidden = false; $('run-error').textContent = error.message; reconcile.disabled = false; reconcile.textContent = 'Check cloud status'; } });
+    reconcile.addEventListener('click', async () => { reconcile.disabled = true; reconcile.textContent = 'Checking…'; try { const response = await fetch(`/api/runs/${encodeURIComponent(run.id)}/reconcile`, {method: 'POST',headers:{'Content-Type':'application/json'},body:'{}'}); const state = await response.json(); if (!response.ok) throw new Error(state.error || 'Could not check cloud status.'); if (activeRun?.id === run.id) renderRun(state); await refreshConfig(); $('run-action-note').hidden = false; $('run-action-note').textContent = remoteUnresolved(state) ? 'Cloud work is still active. Cancellation has not been confirmed.' : 'Cloud status reached a terminal state. This status check did not create a new agent run.'; } catch (error) { $('run-error').hidden = false; $('run-error').textContent = error.message; reconcile.disabled = false; reconcile.textContent = 'Check cloud status'; } });
     buttons.append(view, reconcile); row.append(text, buttons); $('remote-run-list').append(row);
   });
 }
@@ -143,12 +192,32 @@ function artifactUrl(value) {
 }
 function renderArtifacts(run) {
   const artifacts = run.artifacts || {};
-  const mapping = {'report-link': [artifacts.report || artifacts.reportUrl, 'Read audit report'], 'diff-link': [artifacts.diff || artifacts.patch || artifacts.diffUrl || artifacts.pullRequest, 'Review source changes'], 'review-link': [artifacts.review || artifacts.verification || artifacts.reviewUrl, 'Inspect verification']};
+  const readable = run.baseline ? `/report.html?run=${encodeURIComponent(run.id)}` : null;
+  const mapping = {'report-link': [readable, 'Read evidence report'], 'diff-link': [artifacts.diff || artifacts.patch || artifacts.diffUrl || artifacts.pullRequest, 'Review source changes'], 'review-link': [readable && readable + '#provenance', 'Read source review & checks']};
   Object.entries(mapping).forEach(([id, [value, label]]) => {
     const url = artifactUrl(value); const link = $(id);
     if (url) { link.href = url; link.target = '_blank'; link.rel = 'noopener'; link.setAttribute('aria-disabled', 'false'); link.replaceChildren(document.createTextNode(`${label} ↗`)); }
     else { link.removeAttribute('href'); link.setAttribute('aria-disabled', 'true'); link.textContent = 'Available after a run ↗'; }
   });
+}
+function renderProvenance(run) {
+  $('run-provenance').hidden = !run.baseline;
+  if (!run.baseline) return;
+  $('evidence-kind').textContent = run.replay ? 'RECORDED EVIDENCE' : isTerminal(run) ? 'RECORDED RESULT' : 'CURRENT RUN';
+  const calls=run.apiCalls||[], fixer=calls.find(call=>call.role==='fixer');
+  $('fixer-provenance').textContent = run.mode==='local' ? 'Deterministic fixture repairs. No AI provider ran for this result.' : run.mode==='gemini-api' ? `Direct Gemini API${fixer?.model ? ` · ${fixer.model}` : ''}. The model returned changed source files.` : 'A hosted Gemini Managed Agent changed the source. Hosted interaction IDs are recorded in the raw evidence.';
+  const audit=run.verification;
+  const states=Array.isArray(audit?.states)?audit.states:Object.values(audit?.states||{});
+  const coverage=audit?.schemaVersion>=2 ? `${states.filter(state=>state.status==='measured').length} interaction states measured.` : 'Historical rule scan: initial booking page only. Keyboard, validation, and reflow checks are recorded separately.';
+  $('browser-provenance').textContent = `${audit ? 'Fresh Chromium verification. ' : 'Verification is pending. '}${coverage}`;
+  const review=run.review||{};
+  $('review-provenance').textContent = `${review.approved===true?'Approved':review.approved===false?'Not approved':'No verdict recorded'}${review.model?` · ${review.model}`:''}. ${run.mode==='gemini-api'?'Separate source-review request with no fixer conversation.':run.mode==='gemini'?'Separate hosted reviewer environment.':'Local browser verification; no model or human reviewer.'}`;
+  $('review-verdict').textContent=review.summary||'No independent review summary has been recorded.';
+  $('review-findings').replaceChildren();
+  (review.findings||[]).forEach(finding=>{const item=document.createElement('li');item.textContent=finding;$('review-findings').append(item);});
+  const usage=run.metrics||{recordedCalls:calls.length,totalTokens:calls.reduce((sum,call)=>sum+(Number.isFinite(call.usage?.totalTokenCount)?call.usage.totalTokenCount:0),0),unknownUsageCalls:calls.filter(call=>!Number.isFinite(call.usage?.totalTokenCount)).length};
+  $('usage-provenance').textContent = `${run.replay?'Loaded from recorded evidence. No provider call was made to load this result. ':''}${usage.recordedCalls?`${usage.recordedCalls} recorded model calls · ${usage.totalTokens.toLocaleString()} recorded tokens${usage.unknownUsageCalls?` · Usage missing for ${usage.unknownUsageCalls} calls; token total is incomplete.`:'.'}`:'No model usage is recorded for this result.'}`;
+  $('readable-report-link').href=`/report.html?run=${encodeURIComponent(run.id)}`;
 }
 function setPreview(variant) {
   currentVariant = variant;
@@ -171,10 +240,10 @@ $('show-after').addEventListener('click', () => setPreview('after'));
 function renderRun(run) {
   if (run.id !== activeRun?.id) {
     eventCount = -1;
-    const engine = document.querySelector(`input[name="mode"][value="${['gemini', 'gemini-api'].includes(run.mode) ? run.mode : 'local'}"]`);
-    if (engine) engine.checked = true;
+    $('run-action-note').hidden = true;
   }
   activeRun = run;
+  rememberRun(run);
   if (run.mode === 'gemini') {
     blockedManagedRuns = blockedManagedRuns.filter(item => item.id !== run.id);
     if (remoteUnresolved(run)) blockedManagedRuns.push({id: run.id, mode: run.mode, status: run.status, remote: run.remote});
@@ -184,9 +253,15 @@ function renderRun(run) {
   $('run-id').textContent = `Run ${run.id}`;
   const unresolved = isTerminal(run) && remoteUnresolved(run);
   const stopping = cancellationRequestedFor === run.id && !isTerminal(run);
-  setStatus(unresolved ? 'unresolved' : stopping ? 'cancelling' : run.status); renderPipeline(run); renderEvents(run.events); renderMetrics(run); renderArtifacts(run);
+  setStatus(unresolved ? 'unresolved' : stopping ? 'cancelling' : run.status); renderPipeline(run); renderEvents(run.events); renderMetrics(run); renderArtifacts(run); renderProvenance(run);
+  $('history-note').textContent=`${run.replay?'Recorded AI evidence loaded from the published bundle. ':''}Viewing ${engineLabel(run.mode).toLowerCase()} · ${run.status} · ${historyDate(run)} NZ time. Choosing an engine for a new run does not change this record.`;
+  $('run-permalink').hidden=false;$('run-permalink').href=`/?run=${encodeURIComponent(run.id)}`;
   const hasAfter = Boolean(run.verification || run.after);
   $('show-after').disabled = !hasAfter;
+  $('try-before').href=`/preview/${encodeURIComponent(run.id)}/before/`;
+  $('try-after').setAttribute('aria-disabled',String(!hasAfter));
+  $('try-after').textContent=isVerified(run)?'Open repaired site ↗':'Open candidate source ↗';
+  if(hasAfter){$('try-after').href=`/preview/${encodeURIComponent(run.id)}/after/`;$('try-after').target='_blank';$('try-after').rel='noopener';}else $('try-after').removeAttribute('href');
   updatePreviewDescription();
   const terminal = isTerminal(run);
   updateStartAvailability();
@@ -205,7 +280,7 @@ $('stop-run').addEventListener('click', async () => {
   const id = activeRun.id;
   $('stop-run').disabled = true;
   try {
-    const response = await fetch(`/api/runs/${encodeURIComponent(id)}/cancel`, {method: 'POST'});
+    const response = await fetch(`/api/runs/${encodeURIComponent(id)}/cancel`, {method: 'POST',headers:{'Content-Type':'application/json'},body:'{}'});
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'Could not request a stop.');
     cancellationRequestedFor = id;
@@ -220,6 +295,7 @@ async function pollRun(id) {
     const response = await fetch(`/api/runs/${encodeURIComponent(id)}`);
     if (!response.ok) throw new Error(`Could not load run (${response.status}).`);
     const run = await response.json();
+    if(activeRun?.id!==id)return;
     if (!renderRun(run)) pollTimer = setTimeout(() => pollRun(id), 1500);
   } catch (error) {
     $('run-error').hidden = false; $('run-error').textContent = `${error.message} Retrying shortly…`;
@@ -249,4 +325,3 @@ $('start-run').addEventListener('click', async () => {
     await refreshConfig();
   }
 });
-try { const saved = localStorage.getItem('accessible-by-morning-run'); if (saved) fetch(`/api/runs/${encodeURIComponent(saved)}`).then(response => response.ok ? response.json() : null).then(run => { if (!run) return; renderRun(run); setPreview('before'); if (!['completed', 'complete', 'succeeded', 'failed', 'error', 'interrupted', 'cancelled'].includes(run.status)) pollRun(run.id); }).catch(() => {}); } catch {}

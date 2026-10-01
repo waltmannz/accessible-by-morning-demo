@@ -1,0 +1,85 @@
+import {chromium} from 'playwright';
+import axe from 'axe-core';
+import {mkdir,writeFile} from 'node:fs/promises';
+import {startStatic} from '../backend/static.js';
+import path from 'node:path';
+const origin=process.env.DEMO_URL||'http://127.0.0.1:4173';
+const out='runs/ui-verification';await mkdir(out,{recursive:true});
+const browser=await chromium.launch({headless:true});
+const page=await browser.newPage({viewport:{width:1440,height:1050}});
+const errors=[],checks=[];let creates=0;
+page.on('pageerror',error=>errors.push(error.message));
+await page.route('**/api/runs',route=>{if(route.request().method()==='POST'){creates++;return route.fulfill({status:500,contentType:'application/json',body:'{"error":"Creation disabled in read-only QA"}'});}return route.continue();});
+const check=(name,passed)=>{checks.push({name,passed});if(!passed)throw new Error(name);};
+const audit=async target=>{await target.addScriptTag({content:axe.source});return target.evaluate(()=>axe.run({include:[['body']],exclude:[['iframe']]}));};
+const overflow=target=>target.evaluate(()=>document.documentElement.scrollWidth>innerWidth);
+await page.goto(origin,{waitUntil:'networkidle'});
+await page.waitForFunction(()=>document.getElementById('run-history').value);
+const runs=await (await page.request.get(`${origin}/api/runs`)).json();
+const selected=await page.locator('#run-history').inputValue();
+const defaultRun=runs.runs.find(run=>run.id===selected);
+check('Fresh visitor sees a verified AI result',defaultRun?.status==='completed'&&['gemini','gemini-api'].includes(defaultRun.mode)&&defaultRun.review?.approved===true);
+check('Recorded metrics are visible without creating a run',await page.locator('#score-after').textContent()==='100');
+check('Full report uses readable HTML',(await page.locator('#report-link').getAttribute('href')).includes('report.html?run='));
+const newMode=await page.locator('input[name="mode"]:checked').inputValue();
+const local=runs.runs.find(run=>run.mode==='local'&&run.status==='completed');
+if(local){
+ await page.selectOption('#run-history',local.id);
+ await page.waitForFunction(id=>document.getElementById('run-id').textContent.endsWith(id),local.id);
+ check('History shows actual local result provider',(await page.locator('#run-engine').textContent())==='LOCAL DEMONSTRATION');
+ check('Viewing history never changes the engine for a new run',(await page.locator('input[name="mode"]:checked').inputValue())===newMode);
+ await page.reload({waitUntil:'networkidle'});
+ await page.waitForFunction(id=>document.getElementById('run-history').value===id,local.id);
+ check('Explicit history choice persists on reload',(await page.locator('#run-history').inputValue())===local.id);
+}
+const recorded=runs.runs.find(run=>run.replay);
+if(recorded){
+ await page.selectOption('#run-history',recorded.id);
+ await page.waitForFunction(()=>document.getElementById('evidence-kind').textContent==='RECORDED EVIDENCE');
+ check('Replay clearly identifies recorded evidence',(await page.locator('#usage-provenance').textContent()).includes('No provider call was made to load'));
+}
+await page.goto(`${origin}/?run=${encodeURIComponent(defaultRun.id)}`,{waitUntil:'networkidle'});
+await page.waitForFunction(id=>document.getElementById('run-history').value===id,defaultRun.id);
+check('A permalink overrides stored history choice',(await page.locator('#run-history').inputValue())===defaultRun.id);
+await page.locator('#review-details summary').click();
+check('Independent source-review summary is readable',(await page.locator('#review-verdict').textContent()).length>50);
+const dashboardAudit=await audit(page);check('Loaded dashboard has zero axe findings',dashboardAudit.violations.length===0);
+await page.screenshot({path:`${out}/dashboard-improved.png`,fullPage:true});
+await page.setViewportSize({width:390,height:844});check('Dashboard has no mobile horizontal overflow',!(await overflow(page)));
+await page.screenshot({path:`${out}/dashboard-improved-mobile.png`,fullPage:true});
+const report=await browser.newPage({viewport:{width:1440,height:1050}});report.on('pageerror',error=>errors.push(error.message));
+await report.goto(`${origin}/report.html?run=${encodeURIComponent(defaultRun.id)}`,{waitUntil:'networkidle'});
+await report.getByRole('heading',{name:'A repair you can inspect.',exact:true}).waitFor();
+check('Local report identifies pending human testing',(await report.locator('main').innerText()).includes('have not been performed'));
+const reportAudit=await audit(report);if(reportAudit.violations.length)console.log(JSON.stringify(reportAudit.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))})),null,2));check('Readable report has zero axe findings',reportAudit.violations.length===0);
+await report.screenshot({path:`${out}/readable-report.png`,fullPage:true});
+await report.setViewportSize({width:390,height:844});check('Readable report has no mobile horizontal overflow',!(await overflow(report)));
+await report.screenshot({path:`${out}/readable-report-mobile.png`,fullPage:true});
+const site=await startStatic(path.resolve('docs'));
+const showcase=await browser.newPage({viewport:{width:1440,height:1050}});showcase.on('pageerror',error=>errors.push(error.message));
+try{
+ await showcase.goto(site.url,{waitUntil:'networkidle'});
+ await showcase.frameLocator('#clinic-preview').locator('#booking-heading').waitFor();
+ const showcaseAudit=await audit(showcase);check('Polished showcase has zero axe findings',showcaseAudit.violations.length===0);
+ await showcase.screenshot({path:`${out}/public-showcase-after-polish.png`,fullPage:true});
+ await showcase.getByRole('button',{name:'Before repair',exact:true}).focus();await showcase.keyboard.press('Enter');
+ await showcase.waitForFunction(()=>document.getElementById('clinic-preview').src.endsWith('/before/'));
+ check('Keyboard switches to exact original preview',(await showcase.locator('#open-clinic').getAttribute('href'))==='before/');
+ await showcase.getByRole('button',{name:'After repair',exact:true}).focus();await showcase.keyboard.press('Enter');
+ await showcase.waitForFunction(()=>document.getElementById('clinic-preview').src.endsWith('/after/'));
+ check('Keyboard switches to exact repaired preview',(await showcase.locator('#open-clinic').getAttribute('href'))==='after/');
+ check('Supplemental recheck is visibly separate',(await showcase.locator('main').innerText()).includes('separate from the original AI run and review'));
+ await showcase.setViewportSize({width:390,height:844});check('Public showcase has no mobile horizontal overflow',!(await overflow(showcase)));
+ await showcase.screenshot({path:`${out}/public-showcase-after-polish-mobile.png`,fullPage:true});
+ await showcase.goto(`${site.url}/report.html`,{waitUntil:'networkidle'});
+ const publicReportAudit=await audit(showcase);check('Public evidence report has zero axe findings',publicReportAudit.violations.length===0);
+ const links=await showcase.locator('main a[href]').evaluateAll(items=>items.map(a=>a.href));
+ for(const url of links){const response=await showcase.request.get(url);check(`Report evidence link resolves: ${new URL(url).pathname}`,response.ok());}
+ await showcase.screenshot({path:`${out}/public-report-after-polish.png`,fullPage:true});
+ check('Public report has no mobile horizontal overflow',!(await overflow(showcase)));
+}finally{await site.close();}
+check('Read-only UX verification made no provider creation requests',creates===0);
+check('No browser JavaScript errors',errors.length===0);
+await writeFile(`${out}/improved-experience-checks.json`,JSON.stringify({checks,errors,creates,defaultRun:defaultRun.id},null,2));
+console.log(JSON.stringify({checks,errors,creates,defaultRun:defaultRun.id},null,2));
+await browser.close();

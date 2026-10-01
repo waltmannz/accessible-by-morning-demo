@@ -1,0 +1,118 @@
+{
+  "measuredAt": "2026-10-01T21:27:07.918Z",
+  "url": "http://127.0.0.1:65238",
+  "lighthouseScore": 100,
+  "violationCount": 0,
+  "affectedNodes": 0,
+  "violations": [],
+  "keyboard": {
+    "passed": true,
+    "steps": [
+      {
+        "name": "Reach appointment-service by Tab",
+        "passed": true
+      },
+      {
+        "name": "Reach appointment-date by Tab",
+        "passed": true
+      },
+      {
+        "name": "Date test data supplied",
+        "passed": true,
+        "detail": "Native date value seeded; date-picker keystrokes are not covered."
+      },
+      {
+        "name": "Reach appointment-name by Tab",
+        "passed": true
+      },
+      {
+        "name": "Reach appointment-email by Tab",
+        "passed": true
+      },
+      {
+        "name": "Reach 09:30 appointment slot by Tab",
+        "passed": true
+      },
+      {
+        "name": "Reach Book appointment by Tab",
+        "passed": true
+      },
+      {
+        "name": "Visible keyboard focus",
+        "passed": true,
+        "detail": "{\"outline\":\"solid\",\"width\":\"3px\"}"
+      },
+      {
+        "name": "Booking confirmation appears after Enter",
+        "passed": true
+      },
+      {
+        "name": "Confirmation has announcement semantics",
+        "passed": true
+      }
+    ],
+    "confirmation": true
+  },
+  "functionality": {
+    "passed": true,
+    "checks": [
+      {
+        "name": "Past appointment date is rejected",
+        "passed": true
+      },
+      {
+        "name": "Invalid email is rejected",
+        "passed": true
+      },
+      {
+        "name": "Missing name is rejected",
+        "passed": true
+      },
+      {
+        "name": "Missing appointment slot is rejected",
+        "passed": true
+      },
+      {
+        "name": "Error has announcement semantics",
+        "passed": true
+      },
+      {
+        "name": "Confirmation preserves booking details",
+        "passed": true
+      },
+      {
+        "name": "Book another restores the form",
+        "passed": true
+      },
+      {
+        "name": "320 CSS pixel reflow has no horizontal overflow",
+        "passed": true,
+        "detail": "Viewport proxy for 400% zoom at 1280px, not a magnifier user test."
+      }
+    ]
+  },
+  "transcript": [
+    "h1: A little time.A healthier you.",
+    "h2: Book an appointment",
+    "label: What can we help with?",
+    "select: What can we help with?",
+    "label: Your preferred date",
+    "input: Your preferred date",
+    "button: 9:30 am",
+    "button: 11:00 am",
+    "button: 2:30 pm",
+    "label: Your name",
+    "input: Your name",
+    "label: Email address",
+    "input: Email address",
+    "button: Book appointment ↗",
+    "h2: You’re booked in.",
+    "button: Book another appointment"
+  ],
+  "transcriptType": "DOM semantics; not a real screen reader",
+  "humanAudit": {
+    "status": "not-performed"
+  },
+  "axeVersion": "4.13.0",
+  "lighthouseVersion": "13.5.0"
+}

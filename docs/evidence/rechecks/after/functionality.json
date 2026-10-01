@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "Past appointment date is rejected",
+      "passed": true
+    },
+    {
+      "name": "Today is rejected using browser local calendar",
+      "passed": true
+    },
+    {
+      "name": "Invalid email is rejected",
+      "passed": true
+    },
+    {
+      "name": "Missing name is rejected",
+      "passed": true
+    },
+    {
+      "name": "Missing appointment slot is rejected",
+      "passed": true
+    },
+    {
+      "name": "Error has announcement semantics",
+      "passed": true
+    },
+    {
+      "name": "Confirmation preserves booking details",
+      "passed": true
+    },
+    {
+      "name": "Book another restores the form",
+      "passed": true
+    },
+    {
+      "name": "320 CSS pixel reflow has no horizontal overflow",
+      "passed": true,
+      "detail": "Viewport proxy for 400% zoom at 1280px, not a magnifier user test."
+    }
+  ]
+}

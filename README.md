@@ -8,15 +8,17 @@ The site is fictional. No patient information, booking, or email is sent. A pass
 
 ## Run locally
 
+See [QUICKSTART.md](QUICKSTART.md) for the five-minute demonstration and release checklist. A clean checkout can load the published, recorded Gemini repair without a key or another provider call:
+
 Requires Node.js 22 or later, npm, and Chromium system dependencies.
 
 ```sh
 npm ci
 npm run browser:install
-npm start
+npm run demo:show
 ```
 
-Open http://localhost:3000. Try the seeded appointment site, then start a local or Gemini run. The dashboard provides before/after previews, measured evidence, source changes, and the independent verdict. Run artifacts persist under `runs/` across service restarts and are excluded from Git.
+Open http://localhost:3000. The dashboard restores the recorded repair with its original measurement dates, source hashes, and provider review. Try the seeded appointment site and the repaired keyboard booking, or explicitly start a new local or Gemini run. History, previews, readable reports, source changes, and the independent verdict persist under `runs/` across restarts. `npm start` starts the controller without importing the recording.
 
 The command-line pipeline produces the same reports:
 
@@ -25,6 +27,7 @@ npm run demo
 npm run demo -- --gemini-api
 npm run demo -- --gemini
 npm test
+npm run verify:demo
 ```
 
 If port 3000 is occupied, set `PORT=4173` in `.env` and open http://localhost:4173. Managed runs may take several minutes. Cancellation retains remote interaction IDs for diagnosis; after a service restart, interrupted work is shown rather than silently starting another paid run.
@@ -52,10 +55,14 @@ The browser verifier independently checks the returned source. Publication requi
 Prepare a static public comparison only from a completed verified run:
 
 ```sh
-node scripts/publication.js runs/<verified-run-id> docs
+npm run publish:prepare -- runs/<verified-run-id> docs --recheck runs/<browser-recheck-id>
 ```
 
-The command refuses failed runs, missing Lighthouse measurements, failed keyboard/function checks, rejected reviews, and managed reviews that reuse the fixer's environment. It copies only the fixture's three source files, report, and measured evidence; it never copies `.env` or credentials. A public repair PR should replace `fixture/index.html`, `fixture/styles.css`, and `fixture/app.js` with that run's verified `after/` files on a separate branch. Keep `main`'s fixture buggy to repeat the demonstration. GitHub Pages can serve the `docs/` static before/after comparison; the local dashboard remains the run controller.
+The command refuses failed runs, missing Lighthouse measurements, failed keyboard/function checks, rejected reviews, and managed reviews that reuse the fixer's environment. It checks both source versions against the evidence, then bundles only allowed source, browser proof, final review, diff, and reports under a 6 MiB budget. It excludes credentials and raw model responses. `docs/manifest.json` checks file integrity against this bundle; it is not a signature or independent authenticity guarantee. The linked GitHub history supplies provenance. `npm run demo:replay` imports it without overwriting an existing working run.
+
+The original AI review remains dated October 2026. A separate, no-provider-call browser recheck measures the unchanged source in five states: initial, keyboard focus, confirmation, validation error, and narrow reflow. All five repaired states passed axe; their later timestamps and coverage appear separately from the original review. `npm run verify:demo` repeats these measurements and produces a new recheck directory. The optional `--recheck` argument publishes that supplemental proof without claiming another AI review.
+
+A public repair PR should replace `fixture/index.html`, `fixture/styles.css`, and `fixture/app.js` with that run's verified `after/` files on a separate branch. Keep `main`'s fixture buggy and the repair PR unmerged to repeat the demonstration. GitHub Pages serves the `docs/` static comparison; the local dashboard remains the run controller.
 
 ## Operations
 
@@ -67,6 +74,8 @@ docker run --rm -p 8080:8080 --env-file .env -v accessible-evidence:/app/runs ac
 ```
 
 An external hosting deployment is optional and requires the chosen provider's credentials. Local previews and downloadable reports work without hosting.
+
+For a reverse proxy, set `DEMO_PUBLIC_ORIGINS` to the exact comma-separated HTTP/HTTPS origins operators use. Mutation requests require JSON and an allowed origin/host; forwarded headers are not trusted. Keep this list narrow.
 
 `ci/github-actions.example.yml` contains the ready browser/test workflow. Move it to `.github/workflows/check.yml` when publishing with a GitHub credential that has `workflow` scope. The credential used for this demo permits repositories and PRs but lacks that scope; local tests are run directly.
 

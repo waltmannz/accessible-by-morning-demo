@@ -1,0 +1,1232 @@
+{
+  "id": "browser-recheck-2026-10-01T23-17-22-893Z-e89fb55c",
+  "kind": "fresh-browser-recheck",
+  "startedAt": "2026-10-01T23:17:22.893Z",
+  "noProviderCalls": true,
+  "originalAiReviewReused": true,
+  "sourceHashes": {
+    "before": {
+      "index.html": "8919541ff2ccfbb3086311af0f78cec84f8b3c775e9541049350363124c1eee7",
+      "styles.css": "9f4eff8161a49642bd3946cf4cb517330bf2e2293321eadd8eaba34ebdc90ba5",
+      "app.js": "efee75764b7e1733bf2ed24b0b65395bf287e815fe43592072bebbeedcb4c786"
+    },
+    "after": {
+      "index.html": "21458c06aedc401f2aa2252cf3dfd2e0f5b5f9aa156a0ded34d36315a14feda1",
+      "styles.css": "a625d7890ed318b9798e5c91736c3559db376bfb915efa02afeaaf52b3fc5143",
+      "app.js": "25cca6497aed7dca5f296fc314963dc213be80fbba19bac2761b5dc3d1e3707b"
+    }
+  },
+  "limitations": "No new AI review or human screen-reader test. The original model reviewed the original recorded measurements.",
+  "before": {
+    "schemaVersion": 2,
+    "measuredAt": "2026-10-01T23:17:24.883Z",
+    "url": "http://127.0.0.1:62510",
+    "lighthouseScore": 81,
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=axeAPI",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "html": "<span class=\"header-note\">Care that starts with you.</span>",
+            "target": [
+              ".header-note"
+            ],
+            "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1",
+            "stateIds": [
+              "initial",
+              "validation-error",
+              "confirmation"
+            ]
+          },
+          {
+            "html": "<p class=\"intro-copy\">Book a visit with a team that listens. Choose a time, tell us a little about yourself, and we’ll take care of the rest.</p>",
+            "target": [
+              ".intro-copy"
+            ],
+            "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1",
+            "stateIds": [
+              "initial",
+              "validation-error",
+              "confirmation",
+              "reflow"
+            ]
+          },
+          {
+            "html": "<p>Monday–Friday · 8 am–6 pm<br>24 Harbour Lane, Wellington</p>",
+            "target": [
+              ".care-card > div > p"
+            ],
+            "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.99 (foreground color: #83877e, background color: #e6eadc, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1",
+            "stateIds": [
+              "initial",
+              "validation-error",
+              "confirmation",
+              "reflow"
+            ]
+          },
+          {
+            "html": "<p class=\"fixture-note\">Fictional clinic for an accessibility demonstration. No appointment is sent.</p>",
+            "target": [
+              ".fixture-note"
+            ],
+            "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1",
+            "stateIds": [
+              "initial",
+              "validation-error",
+              "confirmation",
+              "reflow"
+            ]
+          },
+          {
+            "html": "<p class=\"form-intro\">A quick visit. A clear next step.</p>",
+            "target": [
+              ".form-intro"
+            ],
+            "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.66 (foreground color: #83877e, background color: #ffffff, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1",
+            "stateIds": [
+              "initial",
+              "validation-error",
+              "confirmation",
+              "reflow"
+            ]
+          },
+          {
+            "html": "<p class=\"privacy-note\">Your details stay with our care team.</p>",
+            "target": [
+              ".privacy-note"
+            ],
+            "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.66 (foreground color: #83877e, background color: #ffffff, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1",
+            "stateIds": [
+              "initial",
+              "validation-error",
+              "reflow"
+            ]
+          },
+          {
+            "html": "<footer>Harbour Health <span>Fictional practice · Real accessibility barriers</span></footer>",
+            "target": [
+              "footer"
+            ],
+            "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1",
+            "stateIds": [
+              "initial",
+              "validation-error",
+              "confirmation",
+              "reflow"
+            ]
+          },
+          {
+            "html": "<span>Fictional practice · Real accessibility barriers</span>",
+            "target": [
+              "footer > span"
+            ],
+            "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1",
+            "stateIds": [
+              "initial",
+              "validation-error",
+              "confirmation",
+              "reflow"
+            ]
+          },
+          {
+            "html": "<p id=\"confirmation-details\">Alex Taylor, your general consultation is reserved for 2026-10-04 at 09:30.</p>",
+            "target": [
+              "#confirmation-details"
+            ],
+            "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.66 (foreground color: #83877e, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1",
+            "stateIds": [
+              "confirmation"
+            ]
+          },
+          {
+            "html": "<p>This is a demo booking. No appointment or email has been sent.</p>",
+            "target": [
+              "p:nth-child(4)"
+            ],
+            "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.66 (foreground color: #83877e, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1",
+            "stateIds": [
+              "confirmation"
+            ]
+          }
+        ],
+        "stateIds": [
+          "initial",
+          "validation-error",
+          "confirmation",
+          "reflow"
+        ]
+      },
+      {
+        "id": "label",
+        "impact": "critical",
+        "description": "Ensure every form element has a label",
+        "help": "Form elements must have labels",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/label?application=axeAPI",
+        "tags": [
+          "cat.forms",
+          "wcag2a",
+          "wcag412",
+          "section508",
+          "section508.22.n",
+          "TTv5",
+          "TT5.c",
+          "EN-301-549",
+          "EN-9.4.1.2",
+          "ACT",
+          "RGAAv4",
+          "RGAA-11.1.1"
+        ],
+        "nodes": [
+          {
+            "html": "<input id=\"appointment-date\" type=\"date\" value=\"2026-10-15\" style=\"\">",
+            "target": [
+              "#appointment-date"
+            ],
+            "failureSummary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element has no placeholder attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\"",
+            "stateIds": [
+              "initial",
+              "validation-error",
+              "reflow"
+            ]
+          }
+        ],
+        "stateIds": [
+          "initial",
+          "validation-error",
+          "reflow"
+        ]
+      },
+      {
+        "id": "page-has-heading-one",
+        "impact": "moderate",
+        "description": "Ensure that the page, or at least one of its frames contains a level-one heading",
+        "help": "Page should contain a level-one heading",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/page-has-heading-one?application=axeAPI",
+        "tags": [
+          "cat.semantics",
+          "best-practice"
+        ],
+        "nodes": [
+          {
+            "html": "<html lang=\"en\">",
+            "target": [
+              "html"
+            ],
+            "failureSummary": "Fix all of the following:\n  Page must have a level-one heading",
+            "stateIds": [
+              "initial",
+              "validation-error",
+              "confirmation",
+              "reflow"
+            ]
+          }
+        ],
+        "stateIds": [
+          "initial",
+          "validation-error",
+          "confirmation",
+          "reflow"
+        ]
+      },
+      {
+        "id": "select-name",
+        "impact": "critical",
+        "description": "Ensure select element has an accessible name",
+        "help": "Select element must have an accessible name",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/select-name?application=axeAPI",
+        "tags": [
+          "cat.forms",
+          "wcag2a",
+          "wcag412",
+          "section508",
+          "section508.22.n",
+          "TTv5",
+          "TT5.c",
+          "EN-301-549",
+          "EN-9.4.1.2",
+          "ACT",
+          "RGAAv4",
+          "RGAA-11.1.1"
+        ],
+        "nodes": [
+          {
+            "html": "<select id=\"appointment-service\"><option value=\"General consultation\">General consultation · 30 min</option><option value=\"Health check\">Health check · 45 min</option></select>",
+            "target": [
+              "#appointment-service"
+            ],
+            "failureSummary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\"",
+            "stateIds": [
+              "initial",
+              "validation-error",
+              "reflow"
+            ]
+          }
+        ],
+        "stateIds": [
+          "initial",
+          "validation-error",
+          "reflow"
+        ]
+      }
+    ],
+    "violationCount": 4,
+    "affectedNodes": 13,
+    "initialViolationCount": 4,
+    "initialAffectedNodes": 11,
+    "states": [
+      {
+        "id": "initial",
+        "label": "Initial booking page",
+        "status": "measured",
+        "measuredAt": "2026-10-01T23:17:23.942Z",
+        "violationCount": 4,
+        "affectedNodes": 11,
+        "violations": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=axeAPI",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "nodes": [
+              {
+                "html": "<span class=\"header-note\">Care that starts with you.</span>",
+                "target": [
+                  ".header-note"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<p class=\"intro-copy\">Book a visit with a team that listens. Choose a time, tell us a little about yourself, and we’ll take care of the rest.</p>",
+                "target": [
+                  ".intro-copy"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<p>Monday–Friday · 8 am–6 pm<br>24 Harbour Lane, Wellington</p>",
+                "target": [
+                  ".care-card > div > p"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.99 (foreground color: #83877e, background color: #e6eadc, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<p class=\"fixture-note\">Fictional clinic for an accessibility demonstration. No appointment is sent.</p>",
+                "target": [
+                  ".fixture-note"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<p class=\"form-intro\">A quick visit. A clear next step.</p>",
+                "target": [
+                  ".form-intro"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.66 (foreground color: #83877e, background color: #ffffff, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<p class=\"privacy-note\">Your details stay with our care team.</p>",
+                "target": [
+                  ".privacy-note"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.66 (foreground color: #83877e, background color: #ffffff, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<footer>Harbour Health <span>Fictional practice · Real accessibility barriers</span></footer>",
+                "target": [
+                  "footer"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<span>Fictional practice · Real accessibility barriers</span>",
+                "target": [
+                  "footer > span"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+              }
+            ]
+          },
+          {
+            "id": "label",
+            "impact": "critical",
+            "description": "Ensure every form element has a label",
+            "help": "Form elements must have labels",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/label?application=axeAPI",
+            "tags": [
+              "cat.forms",
+              "wcag2a",
+              "wcag412",
+              "section508",
+              "section508.22.n",
+              "TTv5",
+              "TT5.c",
+              "EN-301-549",
+              "EN-9.4.1.2",
+              "ACT",
+              "RGAAv4",
+              "RGAA-11.1.1"
+            ],
+            "nodes": [
+              {
+                "html": "<input id=\"appointment-date\" type=\"date\" value=\"2026-10-15\" style=\"\">",
+                "target": [
+                  "#appointment-date"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element has no placeholder attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+              }
+            ]
+          },
+          {
+            "id": "page-has-heading-one",
+            "impact": "moderate",
+            "description": "Ensure that the page, or at least one of its frames contains a level-one heading",
+            "help": "Page should contain a level-one heading",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/page-has-heading-one?application=axeAPI",
+            "tags": [
+              "cat.semantics",
+              "best-practice"
+            ],
+            "nodes": [
+              {
+                "html": "<html lang=\"en\">",
+                "target": [
+                  "html"
+                ],
+                "failureSummary": "Fix all of the following:\n  Page must have a level-one heading"
+              }
+            ]
+          },
+          {
+            "id": "select-name",
+            "impact": "critical",
+            "description": "Ensure select element has an accessible name",
+            "help": "Select element must have an accessible name",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/select-name?application=axeAPI",
+            "tags": [
+              "cat.forms",
+              "wcag2a",
+              "wcag412",
+              "section508",
+              "section508.22.n",
+              "TTv5",
+              "TT5.c",
+              "EN-301-549",
+              "EN-9.4.1.2",
+              "ACT",
+              "RGAAv4",
+              "RGAA-11.1.1"
+            ],
+            "nodes": [
+              {
+                "html": "<select id=\"appointment-service\"><option value=\"General consultation\">General consultation · 30 min</option><option value=\"Health check\">Health check · 45 min</option></select>",
+                "target": [
+                  "#appointment-service"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+              }
+            ]
+          }
+        ],
+        "artifacts": {
+          "axe": "states/initial/axe.json",
+          "screenshot": "states/initial/screenshot.png",
+          "transcript": "states/initial/semantic-transcript.txt"
+        }
+      },
+      {
+        "id": "validation-error",
+        "label": "Visible validation error",
+        "status": "measured",
+        "measuredAt": "2026-10-01T23:17:24.392Z",
+        "violationCount": 4,
+        "affectedNodes": 11,
+        "violations": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=axeAPI",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "nodes": [
+              {
+                "html": "<span class=\"header-note\">Care that starts with you.</span>",
+                "target": [
+                  ".header-note"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<p class=\"intro-copy\">Book a visit with a team that listens. Choose a time, tell us a little about yourself, and we’ll take care of the rest.</p>",
+                "target": [
+                  ".intro-copy"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<p>Monday–Friday · 8 am–6 pm<br>24 Harbour Lane, Wellington</p>",
+                "target": [
+                  ".care-card > div > p"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.99 (foreground color: #83877e, background color: #e6eadc, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<p class=\"fixture-note\">Fictional clinic for an accessibility demonstration. No appointment is sent.</p>",
+                "target": [
+                  ".fixture-note"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<p class=\"form-intro\">A quick visit. A clear next step.</p>",
+                "target": [
+                  ".form-intro"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.66 (foreground color: #83877e, background color: #ffffff, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<p class=\"privacy-note\">Your details stay with our care team.</p>",
+                "target": [
+                  ".privacy-note"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.66 (foreground color: #83877e, background color: #ffffff, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<footer>Harbour Health <span>Fictional practice · Real accessibility barriers</span></footer>",
+                "target": [
+                  "footer"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<span>Fictional practice · Real accessibility barriers</span>",
+                "target": [
+                  "footer > span"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+              }
+            ]
+          },
+          {
+            "id": "label",
+            "impact": "critical",
+            "description": "Ensure every form element has a label",
+            "help": "Form elements must have labels",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/label?application=axeAPI",
+            "tags": [
+              "cat.forms",
+              "wcag2a",
+              "wcag412",
+              "section508",
+              "section508.22.n",
+              "TTv5",
+              "TT5.c",
+              "EN-301-549",
+              "EN-9.4.1.2",
+              "ACT",
+              "RGAAv4",
+              "RGAA-11.1.1"
+            ],
+            "nodes": [
+              {
+                "html": "<input id=\"appointment-date\" type=\"date\" value=\"2026-10-15\">",
+                "target": [
+                  "#appointment-date"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element has no placeholder attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+              }
+            ]
+          },
+          {
+            "id": "page-has-heading-one",
+            "impact": "moderate",
+            "description": "Ensure that the page, or at least one of its frames contains a level-one heading",
+            "help": "Page should contain a level-one heading",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/page-has-heading-one?application=axeAPI",
+            "tags": [
+              "cat.semantics",
+              "best-practice"
+            ],
+            "nodes": [
+              {
+                "html": "<html lang=\"en\">",
+                "target": [
+                  "html"
+                ],
+                "failureSummary": "Fix all of the following:\n  Page must have a level-one heading"
+              }
+            ]
+          },
+          {
+            "id": "select-name",
+            "impact": "critical",
+            "description": "Ensure select element has an accessible name",
+            "help": "Select element must have an accessible name",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/select-name?application=axeAPI",
+            "tags": [
+              "cat.forms",
+              "wcag2a",
+              "wcag412",
+              "section508",
+              "section508.22.n",
+              "TTv5",
+              "TT5.c",
+              "EN-301-549",
+              "EN-9.4.1.2",
+              "ACT",
+              "RGAAv4",
+              "RGAA-11.1.1"
+            ],
+            "nodes": [
+              {
+                "html": "<select id=\"appointment-service\"><option value=\"General consultation\">General consultation · 30 min</option><option value=\"Health check\">Health check · 45 min</option></select>",
+                "target": [
+                  "#appointment-service"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+              }
+            ]
+          }
+        ],
+        "artifacts": {
+          "axe": "states/validation-error/axe.json",
+          "screenshot": "states/validation-error/screenshot.png",
+          "transcript": "states/validation-error/semantic-transcript.txt"
+        }
+      },
+      {
+        "id": "confirmation",
+        "label": "Booking confirmation",
+        "status": "measured",
+        "measuredAt": "2026-10-01T23:17:24.727Z",
+        "violationCount": 2,
+        "affectedNodes": 10,
+        "violations": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=axeAPI",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "nodes": [
+              {
+                "html": "<span class=\"header-note\">Care that starts with you.</span>",
+                "target": [
+                  ".header-note"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<p class=\"intro-copy\">Book a visit with a team that listens. Choose a time, tell us a little about yourself, and we’ll take care of the rest.</p>",
+                "target": [
+                  ".intro-copy"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<p>Monday–Friday · 8 am–6 pm<br>24 Harbour Lane, Wellington</p>",
+                "target": [
+                  ".care-card > div > p"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.99 (foreground color: #83877e, background color: #e6eadc, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<p class=\"fixture-note\">Fictional clinic for an accessibility demonstration. No appointment is sent.</p>",
+                "target": [
+                  ".fixture-note"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<p class=\"form-intro\">A quick visit. A clear next step.</p>",
+                "target": [
+                  ".form-intro"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.66 (foreground color: #83877e, background color: #ffffff, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<p id=\"confirmation-details\">Alex Taylor, your general consultation is reserved for 2026-10-04 at 09:30.</p>",
+                "target": [
+                  "#confirmation-details"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.66 (foreground color: #83877e, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<p>This is a demo booking. No appointment or email has been sent.</p>",
+                "target": [
+                  "p:nth-child(4)"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.66 (foreground color: #83877e, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<footer>Harbour Health <span>Fictional practice · Real accessibility barriers</span></footer>",
+                "target": [
+                  "footer"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<span>Fictional practice · Real accessibility barriers</span>",
+                "target": [
+                  "footer > span"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+              }
+            ]
+          },
+          {
+            "id": "page-has-heading-one",
+            "impact": "moderate",
+            "description": "Ensure that the page, or at least one of its frames contains a level-one heading",
+            "help": "Page should contain a level-one heading",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/page-has-heading-one?application=axeAPI",
+            "tags": [
+              "cat.semantics",
+              "best-practice"
+            ],
+            "nodes": [
+              {
+                "html": "<html lang=\"en\">",
+                "target": [
+                  "html"
+                ],
+                "failureSummary": "Fix all of the following:\n  Page must have a level-one heading"
+              }
+            ]
+          }
+        ],
+        "artifacts": {
+          "axe": "states/confirmation/axe.json",
+          "screenshot": "states/confirmation/screenshot.png",
+          "transcript": "states/confirmation/semantic-transcript.txt"
+        }
+      },
+      {
+        "id": "reflow",
+        "label": "320 CSS pixel booking page",
+        "status": "measured",
+        "measuredAt": "2026-10-01T23:17:24.883Z",
+        "violationCount": 4,
+        "affectedNodes": 10,
+        "violations": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=axeAPI",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "nodes": [
+              {
+                "html": "<p class=\"intro-copy\">Book a visit with a team that listens. Choose a time, tell us a little about yourself, and we’ll take care of the rest.</p>",
+                "target": [
+                  ".intro-copy"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<p>Monday–Friday · 8 am–6 pm<br>24 Harbour Lane, Wellington</p>",
+                "target": [
+                  ".care-card > div > p"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.99 (foreground color: #83877e, background color: #e6eadc, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<p class=\"fixture-note\">Fictional clinic for an accessibility demonstration. No appointment is sent.</p>",
+                "target": [
+                  ".fixture-note"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<p class=\"form-intro\">A quick visit. A clear next step.</p>",
+                "target": [
+                  ".form-intro"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.66 (foreground color: #83877e, background color: #ffffff, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<p class=\"privacy-note\">Your details stay with our care team.</p>",
+                "target": [
+                  ".privacy-note"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.66 (foreground color: #83877e, background color: #ffffff, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<footer>Harbour Health <span>Fictional practice · Real accessibility barriers</span></footer>",
+                "target": [
+                  "footer"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+              },
+              {
+                "html": "<span>Fictional practice · Real accessibility barriers</span>",
+                "target": [
+                  "footer > span"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #83877e, background color: #f5f3ea, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+              }
+            ]
+          },
+          {
+            "id": "label",
+            "impact": "critical",
+            "description": "Ensure every form element has a label",
+            "help": "Form elements must have labels",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/label?application=axeAPI",
+            "tags": [
+              "cat.forms",
+              "wcag2a",
+              "wcag412",
+              "section508",
+              "section508.22.n",
+              "TTv5",
+              "TT5.c",
+              "EN-301-549",
+              "EN-9.4.1.2",
+              "ACT",
+              "RGAAv4",
+              "RGAA-11.1.1"
+            ],
+            "nodes": [
+              {
+                "html": "<input id=\"appointment-date\" type=\"date\" value=\"2026-10-15\">",
+                "target": [
+                  "#appointment-date"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element has no placeholder attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+              }
+            ]
+          },
+          {
+            "id": "page-has-heading-one",
+            "impact": "moderate",
+            "description": "Ensure that the page, or at least one of its frames contains a level-one heading",
+            "help": "Page should contain a level-one heading",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/page-has-heading-one?application=axeAPI",
+            "tags": [
+              "cat.semantics",
+              "best-practice"
+            ],
+            "nodes": [
+              {
+                "html": "<html lang=\"en\">",
+                "target": [
+                  "html"
+                ],
+                "failureSummary": "Fix all of the following:\n  Page must have a level-one heading"
+              }
+            ]
+          },
+          {
+            "id": "select-name",
+            "impact": "critical",
+            "description": "Ensure select element has an accessible name",
+            "help": "Select element must have an accessible name",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/select-name?application=axeAPI",
+            "tags": [
+              "cat.forms",
+              "wcag2a",
+              "wcag412",
+              "section508",
+              "section508.22.n",
+              "TTv5",
+              "TT5.c",
+              "EN-301-549",
+              "EN-9.4.1.2",
+              "ACT",
+              "RGAAv4",
+              "RGAA-11.1.1"
+            ],
+            "nodes": [
+              {
+                "html": "<select id=\"appointment-service\"><option value=\"General consultation\">General consultation · 30 min</option><option value=\"Health check\">Health check · 45 min</option></select>",
+                "target": [
+                  "#appointment-service"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+              }
+            ]
+          }
+        ],
+        "artifacts": {
+          "axe": "states/reflow/axe.json",
+          "screenshot": "states/reflow/screenshot.png",
+          "transcript": "states/reflow/semantic-transcript.txt"
+        }
+      },
+      {
+        "id": "keyboard-focus",
+        "label": "Keyboard focus before booking",
+        "status": "skipped",
+        "reason": "The task could not reach this state; inspect keyboard and functional check failures."
+      }
+    ],
+    "requiredStateIds": [
+      "initial",
+      "validation-error",
+      "keyboard-focus",
+      "confirmation",
+      "reflow"
+    ],
+    "stateCoveragePassed": false,
+    "keyboard": {
+      "passed": false,
+      "steps": [
+        {
+          "name": "Reach appointment-service by Tab",
+          "passed": true
+        },
+        {
+          "name": "Reach appointment-date by Tab",
+          "passed": true
+        },
+        {
+          "name": "Date test data supplied",
+          "passed": true,
+          "detail": "Native date value seeded; date-picker keystrokes are not covered."
+        },
+        {
+          "name": "Reach appointment-name by Tab",
+          "passed": true
+        },
+        {
+          "name": "Reach appointment-email by Tab",
+          "passed": true
+        },
+        {
+          "name": "Reach 09:30 appointment slot by Tab",
+          "passed": false
+        }
+      ],
+      "confirmation": false
+    },
+    "functionality": {
+      "passed": false,
+      "checks": [
+        {
+          "name": "Past appointment date is rejected",
+          "passed": false
+        },
+        {
+          "name": "Today is rejected using browser local calendar",
+          "passed": false
+        },
+        {
+          "name": "Invalid email is rejected",
+          "passed": true
+        },
+        {
+          "name": "Missing name is rejected",
+          "passed": true
+        },
+        {
+          "name": "Missing appointment slot is rejected",
+          "passed": true
+        },
+        {
+          "name": "Error has announcement semantics",
+          "passed": false
+        },
+        {
+          "name": "Confirmation preserves booking details",
+          "passed": true
+        },
+        {
+          "name": "Book another restores the form",
+          "passed": true
+        },
+        {
+          "name": "320 CSS pixel reflow has no horizontal overflow",
+          "passed": true,
+          "detail": "Viewport proxy for 400% zoom at 1280px, not a magnifier user test."
+        }
+      ]
+    },
+    "transcript": [
+      "h2: Book an appointment",
+      "select: unlabelled",
+      "input: unlabelled",
+      "div: 9:30 am",
+      "div: 11:00 am",
+      "div: 2:30 pm",
+      "input: unlabelled",
+      "input: unlabelled",
+      "div: Book appointment ↗"
+    ],
+    "transcriptType": "DOM semantics; not a real screen reader",
+    "humanAudit": {
+      "status": "not-performed"
+    },
+    "axeVersion": "4.13.0",
+    "lighthouseVersion": "13.5.0"
+  },
+  "after": {
+    "schemaVersion": 2,
+    "measuredAt": "2026-10-01T23:17:35.367Z",
+    "url": "http://127.0.0.1:59525",
+    "lighthouseScore": 100,
+    "violations": [],
+    "violationCount": 0,
+    "affectedNodes": 0,
+    "initialViolationCount": 0,
+    "initialAffectedNodes": 0,
+    "states": [
+      {
+        "id": "initial",
+        "label": "Initial booking page",
+        "status": "measured",
+        "measuredAt": "2026-10-01T23:17:34.207Z",
+        "violationCount": 0,
+        "affectedNodes": 0,
+        "violations": [],
+        "artifacts": {
+          "axe": "states/initial/axe.json",
+          "screenshot": "states/initial/screenshot.png",
+          "transcript": "states/initial/semantic-transcript.txt"
+        }
+      },
+      {
+        "id": "keyboard-focus",
+        "label": "Keyboard focus before booking",
+        "status": "measured",
+        "measuredAt": "2026-10-01T23:17:34.375Z",
+        "violationCount": 0,
+        "affectedNodes": 0,
+        "violations": [],
+        "artifacts": {
+          "axe": "states/keyboard-focus/axe.json",
+          "screenshot": "states/keyboard-focus/screenshot.png",
+          "transcript": "states/keyboard-focus/semantic-transcript.txt"
+        }
+      },
+      {
+        "id": "confirmation",
+        "label": "Booking confirmation",
+        "status": "measured",
+        "measuredAt": "2026-10-01T23:17:34.607Z",
+        "violationCount": 0,
+        "affectedNodes": 0,
+        "violations": [],
+        "artifacts": {
+          "axe": "states/confirmation/axe.json",
+          "screenshot": "states/confirmation/screenshot.png",
+          "transcript": "states/confirmation/semantic-transcript.txt"
+        }
+      },
+      {
+        "id": "validation-error",
+        "label": "Visible validation error",
+        "status": "measured",
+        "measuredAt": "2026-10-01T23:17:34.791Z",
+        "violationCount": 0,
+        "affectedNodes": 0,
+        "violations": [],
+        "artifacts": {
+          "axe": "states/validation-error/axe.json",
+          "screenshot": "states/validation-error/screenshot.png",
+          "transcript": "states/validation-error/semantic-transcript.txt"
+        }
+      },
+      {
+        "id": "reflow",
+        "label": "320 CSS pixel booking page",
+        "status": "measured",
+        "measuredAt": "2026-10-01T23:17:35.366Z",
+        "violationCount": 0,
+        "affectedNodes": 0,
+        "violations": [],
+        "artifacts": {
+          "axe": "states/reflow/axe.json",
+          "screenshot": "states/reflow/screenshot.png",
+          "transcript": "states/reflow/semantic-transcript.txt"
+        }
+      }
+    ],
+    "requiredStateIds": [
+      "initial",
+      "validation-error",
+      "keyboard-focus",
+      "confirmation",
+      "reflow"
+    ],
+    "stateCoveragePassed": true,
+    "keyboard": {
+      "passed": true,
+      "steps": [
+        {
+          "name": "Reach appointment-service by Tab",
+          "passed": true
+        },
+        {
+          "name": "Reach appointment-date by Tab",
+          "passed": true
+        },
+        {
+          "name": "Date test data supplied",
+          "passed": true,
+          "detail": "Native date value seeded; date-picker keystrokes are not covered."
+        },
+        {
+          "name": "Reach appointment-name by Tab",
+          "passed": true
+        },
+        {
+          "name": "Reach appointment-email by Tab",
+          "passed": true
+        },
+        {
+          "name": "Reach 09:30 appointment slot by Tab",
+          "passed": true
+        },
+        {
+          "name": "Reach Book appointment by Tab",
+          "passed": true
+        },
+        {
+          "name": "Visible keyboard focus",
+          "passed": true,
+          "detail": "{\"outline\":\"solid\",\"width\":\"3px\"}"
+        },
+        {
+          "name": "Booking confirmation appears after Enter",
+          "passed": true
+        },
+        {
+          "name": "Confirmation has announcement semantics",
+          "passed": true
+        }
+      ],
+      "confirmation": true
+    },
+    "functionality": {
+      "passed": true,
+      "checks": [
+        {
+          "name": "Past appointment date is rejected",
+          "passed": true
+        },
+        {
+          "name": "Today is rejected using browser local calendar",
+          "passed": true
+        },
+        {
+          "name": "Invalid email is rejected",
+          "passed": true
+        },
+        {
+          "name": "Missing name is rejected",
+          "passed": true
+        },
+        {
+          "name": "Missing appointment slot is rejected",
+          "passed": true
+        },
+        {
+          "name": "Error has announcement semantics",
+          "passed": true
+        },
+        {
+          "name": "Confirmation preserves booking details",
+          "passed": true
+        },
+        {
+          "name": "Book another restores the form",
+          "passed": true
+        },
+        {
+          "name": "320 CSS pixel reflow has no horizontal overflow",
+          "passed": true,
+          "detail": "Viewport proxy for 400% zoom at 1280px, not a magnifier user test."
+        }
+      ]
+    },
+    "transcript": [
+      "h1: A little time.A healthier you.",
+      "h2: Book an appointment",
+      "label: What can we help with?",
+      "select: What can we help with?",
+      "label: Your preferred date",
+      "input: Your preferred date",
+      "button: 9:30 am",
+      "button: 11:00 am",
+      "button: 2:30 pm",
+      "label: Your name",
+      "input: Your name",
+      "label: Email address",
+      "input: Email address",
+      "button: Book appointment ↗"
+    ],
+    "transcriptType": "DOM semantics; not a real screen reader",
+    "humanAudit": {
+      "status": "not-performed"
+    },
+    "axeVersion": "4.13.0",
+    "lighthouseVersion": "13.5.0"
+  },
+  "passed": true,
+  "completedAt": "2026-10-01T23:17:41.066Z"
+}

@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 2,
+  "measuredAt": "2026-10-01T23:17:35.367Z",
+  "url": "http://127.0.0.1:59525",
+  "lighthouseScore": 100,
+  "violations": [],
+  "violationCount": 0,
+  "affectedNodes": 0,
+  "initialViolationCount": 0,
+  "initialAffectedNodes": 0,
+  "states": [
+    {
+      "id": "initial",
+      "label": "Initial booking page",
+      "status": "measured",
+      "measuredAt": "2026-10-01T23:17:34.207Z",
+      "violationCount": 0,
+      "affectedNodes": 0,
+      "violations": [],
+      "artifacts": {
+        "axe": "states/initial/axe.json",
+        "screenshot": "states/initial/screenshot.png",
+        "transcript": "states/initial/semantic-transcript.txt"
+      }
+    },
+    {
+      "id": "keyboard-focus",
+      "label": "Keyboard focus before booking",
+      "status": "measured",
+      "measuredAt": "2026-10-01T23:17:34.375Z",
+      "violationCount": 0,
+      "affectedNodes": 0,
+      "violations": [],
+      "artifacts": {
+        "axe": "states/keyboard-focus/axe.json",
+        "screenshot": "states/keyboard-focus/screenshot.png",
+        "transcript": "states/keyboard-focus/semantic-transcript.txt"
+      }
+    },
+    {
+      "id": "confirmation",
+      "label": "Booking confirmation",
+      "status": "measured",
+      "measuredAt": "2026-10-01T23:17:34.607Z",
+      "violationCount": 0,
+      "affectedNodes": 0,
+      "violations": [],
+      "artifacts": {
+        "axe": "states/confirmation/axe.json",
+        "screenshot": "states/confirmation/screenshot.png",
+        "transcript": "states/confirmation/semantic-transcript.txt"
+      }
+    },
+    {
+      "id": "validation-error",
+      "label": "Visible validation error",
+      "status": "measured",
+      "measuredAt": "2026-10-01T23:17:34.791Z",
+      "violationCount": 0,
+      "affectedNodes": 0,
+      "violations": [],
+      "artifacts": {
+        "axe": "states/validation-error/axe.json",
+        "screenshot": "states/validation-error/screenshot.png",
+        "transcript": "states/validation-error/semantic-transcript.txt"
+      }
+    },
+    {
+      "id": "reflow",
+      "label": "320 CSS pixel booking page",
+      "status": "measured",
+      "measuredAt": "2026-10-01T23:17:35.366Z",
+      "violationCount": 0,
+      "affectedNodes": 0,
+      "violations": [],
+      "artifacts": {
+        "axe": "states/reflow/axe.json",
+        "screenshot": "states/reflow/screenshot.png",
+        "transcript": "states/reflow/semantic-transcript.txt"
+      }
+    }
+  ],
+  "requiredStateIds": [
+    "initial",
+    "validation-error",
+    "keyboard-focus",
+    "confirmation",
+    "reflow"
+  ],
+  "stateCoveragePassed": true,
+  "keyboard": {
+    "passed": true,
+    "steps": [
+      {
+        "name": "Reach appointment-service by Tab",
+        "passed": true
+      },
+      {
+        "name": "Reach appointment-date by Tab",
+        "passed": true
+      },
+      {
+        "name": "Date test data supplied",
+        "passed": true,
+        "detail": "Native date value seeded; date-picker keystrokes are not covered."
+      },
+      {
+        "name": "Reach appointment-name by Tab",
+        "passed": true
+      },
+      {
+        "name": "Reach appointment-email by Tab",
+        "passed": true
+      },
+      {
+        "name": "Reach 09:30 appointment slot by Tab",
+        "passed": true
+      },
+      {
+        "name": "Reach Book appointment by Tab",
+        "passed": true
+      },
+      {
+        "name": "Visible keyboard focus",
+        "passed": true,
+        "detail": "{\"outline\":\"solid\",\"width\":\"3px\"}"
+      },
+      {
+        "name": "Booking confirmation appears after Enter",
+        "passed": true
+      },
+      {
+        "name": "Confirmation has announcement semantics",
+        "passed": true
+      }
+    ],
+    "confirmation": true
+  },
+  "functionality": {
+    "passed": true,
+    "checks": [
+      {
+        "name": "Past appointment date is rejected",
+        "passed": true
+      },
+      {
+        "name": "Today is rejected using browser local calendar",
+        "passed": true
+      },
+      {
+        "name": "Invalid email is rejected",
+        "passed": true
+      },
+      {
+        "name": "Missing name is rejected",
+        "passed": true
+      },
+      {
+        "name": "Missing appointment slot is rejected",
+        "passed": true
+      },
+      {
+        "name": "Error has announcement semantics",
+        "passed": true
+      },
+      {
+        "name": "Confirmation preserves booking details",
+        "passed": true
+      },
+      {
+        "name": "Book another restores the form",
+        "passed": true
+      },
+      {
+        "name": "320 CSS pixel reflow has no horizontal overflow",
+        "passed": true,
+        "detail": "Viewport proxy for 400% zoom at 1280px, not a magnifier user test."
+      }
+    ]
+  },
+  "transcript": [
+    "h1: A little time.A healthier you.",
+    "h2: Book an appointment",
+    "label: What can we help with?",
+    "select: What can we help with?",
+    "label: Your preferred date",
+    "input: Your preferred date",
+    "button: 9:30 am",
+    "button: 11:00 am",
+    "button: 2:30 pm",
+    "label: Your name",
+    "input: Your name",
+    "label: Email address",
+    "input: Email address",
+    "button: Book appointment ↗"
+  ],
+  "transcriptType": "DOM semantics; not a real screen reader",
+  "humanAudit": {
+    "status": "not-performed"
+  },
+  "axeVersion": "4.13.0",
+  "lighthouseVersion": "13.5.0"
+}

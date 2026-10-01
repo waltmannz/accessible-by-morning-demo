@@ -1,0 +1,12 @@
+DOM semantic inspection, not NVDA/JAWS or human testing.
+h2: Book an appointment
+select: unlabelled
+input: unlabelled
+div: 9:30 am
+div: 11:00 am
+div: 2:30 pm
+input: unlabelled
+input: unlabelled
+div: Book appointment ↗
+h2: You’re booked in.
+button: Book another appointment
