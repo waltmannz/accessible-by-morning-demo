@@ -34,3 +34,10 @@ test('source artifact rejects paths beyond fixed fixture allowlist',()=>{
   assert.throws(()=>validateFiles({'../secret':'text'}),/allowlist/);
   assert.deepEqual(parseAgentJson({steps:[{type:'model_output',content:[{type:'text',text:'```json\n{"approved":true}\n```'}]}]}),{approved:true});
 });
+test('timed out background work requests cancellation and persists its remote identity',async()=>{
+  const requests=[],states=[];
+  const agent=new GeminiManagedAgent({apiKey:'test',timeoutMs:-1,onState:state=>states.push(state),fetchImpl:async(url,options)=>{requests.push({url,options});return {ok:true,status:200,json:async()=>({id:'timeout-job',environment_id:'timeout-env',status:'in_progress'})};}});
+  await assert.rejects(()=>agent.run({input:'repair',sources:[]}),/timeout/);
+  assert.match(requests.at(-1).url,/interactions\/timeout-job\/cancel$/);
+  assert.equal(states.at(-1).id,'timeout-job');assert.equal(states.at(-1).cancellationStatus,'requested');
+});

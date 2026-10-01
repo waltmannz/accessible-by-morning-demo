@@ -120,6 +120,10 @@ function updatePreviewDescription() {
 $('show-before').addEventListener('click', () => setPreview('before'));
 $('show-after').addEventListener('click', () => setPreview('after'));
 function renderRun(run) {
+  if (run.id !== activeRun?.id) {
+    const engine = document.querySelector(`input[name="mode"][value="${run.mode === 'gemini' ? 'gemini' : 'local'}"]`);
+    if (engine) engine.checked = true;
+  }
   activeRun = run;
   updateMode();
   $('run-id').textContent = `Run ${run.id}`;

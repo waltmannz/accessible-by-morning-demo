@@ -35,6 +35,7 @@ const stateChecks = await page.evaluate(() => {
 });
 const runList = await (await page.request.get(`${origin}/api/runs`)).json();
 const completed = runList.runs?.find(run=>run.status==='completed');
+const artifactChecks = [];
 if(completed){
   await page.setViewportSize({width:1440,height:1050});
   await page.evaluate(run=>{renderRun(run);setPreview('after');},completed);
@@ -43,8 +44,13 @@ if(completed){
   catch(error) { console.log(JSON.stringify(await page.evaluate(()=>({src:document.getElementById('preview').src,frame:document.getElementById('preview').contentDocument?.body?.innerText,html:document.getElementById('preview').outerHTML})),null,2)); throw error; }
   await page.evaluate(()=>scrollTo(0,0));
   await page.screenshot({path:path.join(out,'dashboard-completed.png'),fullPage:true});
+  for(const id of ['report-link','diff-link','review-link']){
+    const href = await page.locator(`#${id}`).getAttribute('href');
+    const response = href ? await page.request.get(href) : null;
+    artifactChecks.push({name:id,passed:response?.ok()||false,status:response?.status()||null});
+  }
 }
-await writeFile(path.join(out,'dashboard-audit.json'),JSON.stringify({violations:audit.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>n.target)})),errors,desktopOverflow:overflow,mobileOverflow,stateChecks,completedRun:completed?.id||null},null,2));
-console.log(JSON.stringify({violations:audit.violations.length,errors,desktopOverflow:overflow,mobileOverflow,stateChecks,completedRun:completed?.id||null,output:out},null,2));
+await writeFile(path.join(out,'dashboard-audit.json'),JSON.stringify({violations:audit.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>n.target)})),errors,desktopOverflow:overflow,mobileOverflow,stateChecks,artifactChecks,completedRun:completed?.id||null},null,2));
+console.log(JSON.stringify({violations:audit.violations.length,errors,desktopOverflow:overflow,mobileOverflow,stateChecks,artifactChecks,completedRun:completed?.id||null,output:out},null,2));
 await browser.close();
-if(audit.violations.length||errors.length||overflow||mobileOverflow||stateChecks.some(check=>!check.passed))process.exitCode=1;
+if(audit.violations.length||errors.length||overflow||mobileOverflow||stateChecks.some(check=>!check.passed)||artifactChecks.some(check=>!check.passed))process.exitCode=1;
