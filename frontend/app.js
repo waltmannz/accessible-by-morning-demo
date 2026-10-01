@@ -104,6 +104,7 @@ function renderArtifacts(run) {
 function setPreview(variant) {
   currentVariant = variant;
   const url = activeRun?.id ? `/preview/${encodeURIComponent(activeRun.id)}/${variant}/` : '/preview/fixture/';
+  $('preview').loading = 'eager';
   $('preview').src = url;
   $('preview').title = `Harbour Health appointment booking preview, ${variant === 'before' ? 'before repair' : 'after repair'}`;
   $('open-preview').href = url;

@@ -32,7 +32,9 @@ export class GeminiManagedAgent {
   async request(endpoint,{method='GET',body,retry=true}={}) {
     for (let attempt=0;attempt<3;attempt++) {
       this.signal?.throwIfAborted();
-      const response = await this.fetch(`${BASE}${endpoint}`,{method,headers:{'content-type':'application/json','x-goog-api-key':this.apiKey,'Api-Revision':'2026-05-20'},body:body ? JSON.stringify(body) : undefined,signal:AbortSignal.any([AbortSignal.timeout(60000),...(this.signal?[this.signal]:[])])});
+      let response;
+      try {response = await this.fetch(`${BASE}${endpoint}`,{method,headers:{'content-type':'application/json','x-goog-api-key':this.apiKey,'Api-Revision':'2026-05-20'},body:body ? JSON.stringify(body) : undefined,signal:AbortSignal.any([AbortSignal.timeout(60000),...(this.signal?[this.signal]:[])])});}
+      catch(error){if(retry&&method==='GET'&&attempt<2&&!this.signal?.aborted){await delay(1000*2**attempt,undefined,{signal:this.signal});continue;}throw error;}
       if (response.ok) return response.status === 204 ? {} : response.json();
       // A create POST is never retried: an ambiguous outcome could start duplicate billable work.
       if (retry && method==='GET' && [429,500,502,503,504].includes(response.status) && attempt<2) { await delay(1000*2**attempt,undefined,{signal:this.signal}); continue; }
@@ -51,14 +53,16 @@ export class GeminiManagedAgent {
         if (['in_progress','queued','pending'].includes(interaction.status)) { await delay(this.pollMs,undefined,{signal:this.signal}); interaction=await this.request(`/interactions/${encodeURIComponent(interaction.id)}`); continue; }
         if (interaction.status==='incomplete' && continuations++<this.maxContinuations) {
           if (!interaction.environment_id) throw new Error('Incomplete agent interaction has no environment ID');
-          interaction=await this.request('/interactions',{method:'POST',retry:false,body:{...config,input:'Continue from progress.md. Complete the task and return the requested final JSON source artifact.',previous_interaction_id:interaction.id,environment:interaction.environment_id}}); continue;
+          interaction=await this.request('/interactions',{method:'POST',retry:false,body:{...config,input:'Continue from progress.md. Prioritize completing and exporting the requested JSON artifact NOW. Browser measurement runs independently outside this sandbox, so do not spend the remaining budget installing browser packages. Read the final source files and return their complete contents in the requested JSON.',previous_interaction_id:interaction.id,environment:interaction.environment_id}}); continue;
         }
         if (interaction.status!=='completed') throw new Error(`Gemini ${role} ended with status ${interaction.status}`);
         return interaction;
       }
     } catch(error) {
       if (interaction?.id && ['in_progress','queued','pending'].includes(interaction.status)) {
-        try { await this.fetch(`${BASE}/interactions/${encodeURIComponent(interaction.id)}/cancel`,{method:'POST',headers:{'x-goog-api-key':this.apiKey},signal:AbortSignal.timeout(15000)}); } catch { /* Persist last ID for manual cancellation. */ }
+        let cancellationStatus='unconfirmed';
+        try { const response=await this.fetch(`${BASE}/interactions/${encodeURIComponent(interaction.id)}/cancel`,{method:'POST',headers:{'x-goog-api-key':this.apiKey},signal:AbortSignal.timeout(15000)});cancellationStatus=response.ok?'requested':`HTTP ${response.status}`; } catch { /* Persist last ID for manual cancellation. */ }
+        await this.onState({role,id:interaction.id,environment_id:interaction.environment_id,status:interaction.status,cancellationStatus});
       }
       throw error;
     }

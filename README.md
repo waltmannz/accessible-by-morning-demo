@@ -26,6 +26,14 @@ npm test
 
 If port 3000 is occupied, set `PORT=4173` in `.env` and open http://localhost:4173. Managed runs may take several minutes. Cancellation retains remote interaction IDs for diagnosis; after a service restart, interrupted work is shown rather than silently starting another paid run.
 
+Once a managed interaction has finished, recheck an exported candidate without starting another initial paid fixer run:
+
+```sh
+npm run demo -- --resume <managed-run-id>
+```
+
+Resume rejects a still-active hosted interaction. It reruns the current browser checks and starts a fresh managed review; failed verification can send its findings back to the existing fixer environment.
+
 For Gemini mode, copy `.env.example` to `.env` and configure `GEMINI_API_KEY` locally, or set it in your shell. Never commit a real key. The managed preview must be enabled for that key/project; a standard Gemini key does not guarantee preview access. The adapter uses `antigravity-preview-09-2026`, REST Interactions, inline fixture sources, bounded polling and continuation, and a fresh review environment. It does not silently switch a Gemini run to local repair.
 
 ## Evidence and deliberate defects
@@ -52,6 +60,8 @@ docker run --rm -p 8080:8080 --env-file .env -v accessible-evidence:/app/runs ac
 ```
 
 An external hosting deployment is optional and requires the chosen provider's credentials. Local previews and downloadable reports work without hosting.
+
+`ci/github-actions.example.yml` contains the ready browser/test workflow. Move it to `.github/workflows/check.yml` when publishing with a GitHub credential that has `workflow` scope. The credential used for this demo permits repositories and PRs but lacks that scope; local tests are run directly.
 
 ## Sources
 
