@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Harbour Health · Book an appointment</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">✳</span> Harbour Health</a>
+    <span class="header-note">Care that starts with you.</span>
+  </header>
+  <main>
+    <section class="introduction">
+      <p class="eyebrow">YOUR NEIGHBOURHOOD CLINIC</p>
+      <span class="page-title">A little time.<br>A healthier you.</span>
+      <p class="intro-copy">Book a visit with a team that listens. Choose a time, tell us a little about yourself, and we’ll take care of the rest.</p>
+      <div class="care-card"><span class="care-icon" aria-hidden="true">✚</span><div><strong>Good care, close to home.</strong><p>Monday–Friday · 8 am–6 pm<br>24 Harbour Lane, Wellington</p></div></div>
+      <p class="fixture-note">Fictional clinic for an accessibility demonstration. No appointment is sent.</p>
+    </section>
+    <section class="booking-card" aria-labelledby="booking-heading">
+      <p class="eyebrow">LET’S FIND A TIME</p>
+      <h2 id="booking-heading">Book an appointment</h2>
+      <p class="form-intro">A quick visit. A clear next step.</p>
+      <div id="booking-form">
+        <div class="field"><div class="field-label">What can we help with?</div><select id="appointment-service"><option value="General consultation">General consultation · 30 min</option><option value="Health check">Health check · 45 min</option></select></div>
+        <div class="field"><div class="field-label">Your preferred date</div><input id="appointment-date" type="date" value="2026-10-15"></div>
+        <div class="field"><div class="field-label">Available times</div><div class="slots"><div class="slot" data-slot="09:30">9:30 am</div><div class="slot" data-slot="11:00">11:00 am</div><div class="slot" data-slot="14:30">2:30 pm</div></div></div>
+        <div class="field-row"><div class="field"><div class="field-label">Your name</div><input id="appointment-name" placeholder="Alex Morgan" autocomplete="name"></div><div class="field"><div class="field-label">Email address</div><input id="appointment-email" type="email" placeholder="alex@example.com" autocomplete="email"></div></div>
+        <p id="booking-error" class="booking-error" hidden></p>
+        <div id="book-appointment" class="book-button">Book appointment <span aria-hidden="true">↗</span></div>
+        <p class="privacy-note">Your details stay with our care team.</p>
+      </div>
+      <div id="confirmation" class="confirmation" hidden><span class="confirmation-icon" aria-hidden="true">✓</span><h2>You’re booked in.</h2><p id="confirmation-details"></p><p>This is a demo booking. No appointment or email has been sent.</p><button id="book-another" class="another-button" type="button">Book another appointment</button></div>
+    </section>
+  </main>
+  <footer>Harbour Health <span>Fictional practice · Real accessibility barriers</span></footer>
+</body>
+</html>
