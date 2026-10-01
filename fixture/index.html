@@ -15,7 +15,7 @@
   <main>
     <section class="introduction">
       <p class="eyebrow">YOUR NEIGHBOURHOOD CLINIC</p>
-      <span class="page-title">A little time.<br>A healthier you.</span>
+      <h1 class="page-title">A little time.<br>A healthier you.</h1>
       <p class="intro-copy">Book a visit with a team that listens. Choose a time, tell us a little about yourself, and we’ll take care of the rest.</p>
       <div class="care-card"><span class="care-icon" aria-hidden="true">✚</span><div><strong>Good care, close to home.</strong><p>Monday–Friday · 8 am–6 pm<br>24 Harbour Lane, Wellington</p></div></div>
       <p class="fixture-note">Fictional clinic for an accessibility demonstration. No appointment is sent.</p>
@@ -24,16 +24,49 @@
       <p class="eyebrow">LET’S FIND A TIME</p>
       <h2 id="booking-heading">Book an appointment</h2>
       <p class="form-intro">A quick visit. A clear next step.</p>
-      <div id="booking-form">
-        <div class="field"><div class="field-label">What can we help with?</div><select id="appointment-service"><option value="General consultation">General consultation · 30 min</option><option value="Health check">Health check · 45 min</option></select></div>
-        <div class="field"><div class="field-label">Your preferred date</div><input id="appointment-date" type="date" value="2026-10-15"></div>
-        <div class="field"><div class="field-label">Available times</div><div class="slots"><div class="slot" data-slot="09:30">9:30 am</div><div class="slot" data-slot="11:00">11:00 am</div><div class="slot" data-slot="14:30">2:30 pm</div></div></div>
-        <div class="field-row"><div class="field"><div class="field-label">Your name</div><input id="appointment-name" placeholder="Alex Morgan" autocomplete="name"></div><div class="field"><div class="field-label">Email address</div><input id="appointment-email" type="email" placeholder="alex@example.com" autocomplete="email"></div></div>
-        <p id="booking-error" class="booking-error" hidden></p>
-        <div id="book-appointment" class="book-button">Book appointment <span aria-hidden="true">↗</span></div>
+      <form id="booking-form" novalidate>
+        <div class="field">
+          <label class="field-label" for="appointment-service">What can we help with?</label>
+          <select id="appointment-service">
+            <option value="General consultation">General consultation · 30 min</option>
+            <option value="Health check">Health check · 45 min</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label" for="appointment-date">Your preferred date</label>
+          <input id="appointment-date" type="date" value="2026-10-15">
+        </div>
+        <fieldset class="field slot-fieldset">
+          <legend class="field-label">Available times</legend>
+          <div class="slots" role="group" aria-label="Available times">
+            <button type="button" class="slot" data-slot="09:30" aria-pressed="false">9:30 am</button>
+            <button type="button" class="slot" data-slot="11:00" aria-pressed="false">11:00 am</button>
+            <button type="button" class="slot" data-slot="14:30" aria-pressed="false">2:30 pm</button>
+          </div>
+        </fieldset>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label" for="appointment-name">Your name</label>
+            <input id="appointment-name" type="text" placeholder="Alex Morgan" autocomplete="name">
+          </div>
+          <div class="field">
+            <label class="field-label" for="appointment-email">Email address</label>
+            <input id="appointment-email" type="email" placeholder="alex@example.com" autocomplete="email">
+          </div>
+        </div>
+        <p id="booking-error" class="booking-error" role="alert" aria-live="assertive" hidden></p>
+        <button type="submit" id="book-appointment" class="book-button">
+          <span>Book appointment</span> <span aria-hidden="true">↗</span>
+        </button>
         <p class="privacy-note">Your details stay with our care team.</p>
+      </form>
+      <div id="confirmation" class="confirmation" role="region" aria-live="polite" tabindex="-1" hidden>
+        <span class="confirmation-icon" aria-hidden="true">✓</span>
+        <h2 id="confirmation-heading">You’re booked in.</h2>
+        <p id="confirmation-details"></p>
+        <p>This is a demo booking. No appointment or email has been sent.</p>
+        <button id="book-another" class="another-button" type="button">Book another appointment</button>
       </div>
-      <div id="confirmation" class="confirmation" hidden><span class="confirmation-icon" aria-hidden="true">✓</span><h2>You’re booked in.</h2><p id="confirmation-details"></p><p>This is a demo booking. No appointment or email has been sent.</p><button id="book-another" class="another-button" type="button">Book another appointment</button></div>
     </section>
   </main>
   <footer>Harbour Health <span>Fictional practice · Real accessibility barriers</span></footer>
